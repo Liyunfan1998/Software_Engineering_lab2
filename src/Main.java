@@ -12,26 +12,26 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.List;
+//import java.util.GregorianCalendar;
 
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        CalendarDate calendarDate = DateUtil.getToday();
         // Create a new CalendarPane
-        CalendarPane calendarPane = new CalendarPane();
+        CalendarPane calendarPane = new CalendarPane(calendarDate);
 
         // Pane to hold buttons
         HBox buttonBox = new HBox(10);
         Button btAdd = new Button(">");
         Button btSub = new Button("<");
-        btAdd.setOnAction(e -> calendarPane.nextMonth());
-        btSub.setOnAction(e -> calendarPane.lastMonth());
+        btAdd.setOnAction(e -> calendarPane.nextMonth(calendarDate));
+        btSub.setOnAction(e -> calendarPane.lastMonth(calendarDate));
         buttonBox.getChildren().addAll(btSub, btAdd);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -55,45 +55,57 @@ public class Main extends Application {
  * Extend the Pane class that will create a calendar pane
  */
 class CalendarPane extends Pane {
-    private Calendar calendar;
+    //    private Calendar calendar;
+//    private CalendarDate calendarDate;
     private Text calendarLabel;
     private String monthName;
 
     /**
      * Default constructor
      */
-    CalendarPane() {
-        calendar = GregorianCalendar.getInstance();
-        calendar.set(Calendar.DATE, 1);
-        draw();
+    CalendarPane(CalendarDate calendarDate) {
+        calendarDate = DateUtil.getToday();
+//        calendarDate.setDay(1);
+        draw(calendarDate);
     }
 
     /**
      * Advance the calendar by 1 month
      */
-    public void nextMonth() {
-        calendar.add(Calendar.MONTH, 1);
-        draw();
+    public void nextMonth(CalendarDate calendarDate) {
+        int m = calendarDate.getMonth();
+        if (m == 12) {
+            m = 0;
+            int y = calendarDate.getYear();
+            calendarDate.setYear(y + 1);
+        }
+        calendarDate.setMonth(m + 1);
+        draw(calendarDate);
     }
 
     /**
      * Decrement the calendar by 1 month
      */
-    public void lastMonth() {
-        calendar.add(Calendar.MONTH, -1);
-        draw();
+    public void lastMonth(CalendarDate calendarDate) {
+        int m = calendarDate.getMonth();
+        if (m == 1) {
+            m = 13;
+            int y = calendarDate.getYear();
+            calendarDate.setYear(y - 1);
+        }
+        calendarDate.setMonth(m - 1);
+        draw(calendarDate);
     }
 
     /**
      * Set up the calendar pane and get the require objects
      */
-    private void draw() {
+    private void draw(CalendarDate calendarDate) {
         this.getChildren().clear();
-
         // Create the border pane, then get the calendar header and body
         BorderPane borderPane = new BorderPane();
-        borderPane.setTop(getCalendarHeader());
-        borderPane.setCenter(getCalendarGrid());
+        borderPane.setTop(getCalendarHeader(calendarDate)); //OK
+        borderPane.setCenter(getCalendarGrid(calendarDate));    //Not ok
 
         displayCalendar(borderPane);
     }
@@ -105,10 +117,14 @@ class CalendarPane extends Pane {
         this.getChildren().addAll(borderPane);
     }
 
-    private Pane getCalendarGrid() {
+    private void showToday() {
+        draw(DateUtil.getToday());
+    }
+
+    private Pane getCalendarGrid(CalendarDate calendarDate) {
         // Variables
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+        int dayOfWeek = calendarDate.getDayOfWeek();
+        int daysInMonth = DateUtil.getNumberOfDaysInMonth(calendarDate);
 
         // Create the GridPane for the calendar
         GridPane calendarGrid = new GridPane();
@@ -122,42 +138,27 @@ class CalendarPane extends Pane {
                 new Text("Friday"), new Text("Saturday"));
 
         // Print the dates for the current month's calendar
-        Calendar thisMonth = (Calendar) calendar.clone(); // Clone does not effect current calendar object
+        //        Calendar lastMonth = (Calendar) calendar.clone();
+        List<CalendarDate> thisMonth = DateUtil.getDaysInMonth(calendarDate);
+        // Clone does not effect current calendar object
         for (int i = 1; i <= daysInMonth; i++) {
-            calendarGrid.add(new Text(thisMonth.get(Calendar.DATE) + ""), thisMonth.get(Calendar.DAY_OF_WEEK) - 1, thisMonth.get(Calendar.WEEK_OF_MONTH));
-            thisMonth.add(Calendar.DATE, 1);
+            CalendarDate cd = thisMonth.get(i - 1);
+            int columnIndex = cd.getDayOfWeek() % 7;
+            int rowIndex = DateUtil.getLineInPane(cd);
+            calendarGrid.add(new Text(cd.getDay() + ""), columnIndex, rowIndex);
         }
 
         // Print the dates for the previous month on the current calendar
-        Calendar lastMonth = (Calendar) calendar.clone();
-        lastMonth.add(Calendar.DAY_OF_MONTH, -1);
-        if (dayOfWeek != 1)
-            for (int i = lastMonth.get(Calendar.DAY_OF_WEEK) - 1; i >= 0; i--) {
-                Text dateNumbers = new Text(lastMonth.get(Calendar.DATE) + "");
-                dateNumbers.setFill(Color.GRAY);
-                calendarGrid.add(dateNumbers, lastMonth.get(Calendar.DAY_OF_WEEK) - 1, 1);
-                lastMonth.add(Calendar.DATE, -1);
-            }
 
         // Print the dates for the next month on the current calendar
-        Calendar nextMonth = (Calendar) calendar.clone();
-        nextMonth.add(Calendar.MONTH, 1);
-        if (nextMonth.get(Calendar.DAY_OF_WEEK) != 1)
-            for (int i = nextMonth.get(Calendar.DAY_OF_WEEK) - 1; i < 7; i++) {
-                Text dateNumbers = new Text(nextMonth.get(Calendar.DATE) + "");
-                dateNumbers.setFill(Color.GRAY);
-                calendarGrid.add(dateNumbers, nextMonth.get(Calendar.DAY_OF_WEEK) - 1, calendar.getActualMaximum(Calendar.WEEK_OF_MONTH));
-                nextMonth.add(Calendar.DATE, 1);
-            }
-
         return calendarGrid;
     }
 
     /**
      * Create the label pane and display current month and year
      */
-    private Pane getCalendarHeader() {
-        calendarLabel = new Text(getMonthName(calendar.get(Calendar.MONTH)) + ", " + calendar.get(Calendar.YEAR));
+    private Pane getCalendarHeader(CalendarDate calendarDate) {
+        calendarLabel = new Text(getMonthName(calendarDate.getMonth()) + ", " + calendarDate.getYear());
         HBox labelBox = new HBox();
         labelBox.getChildren().addAll(calendarLabel);
         labelBox.setAlignment(Pos.CENTER);
@@ -172,40 +173,40 @@ class CalendarPane extends Pane {
         // String monthName = null;
 
         switch (month) {
-            case 0:
+            case 1:
                 monthName = "January";
                 break;
-            case 1:
+            case 2:
                 monthName = "February";
                 break;
-            case 2:
+            case 3:
                 monthName = "March";
                 break;
-            case 3:
+            case 4:
                 monthName = "April";
                 break;
-            case 4:
+            case 5:
                 monthName = "May";
                 break;
-            case 5:
+            case 6:
                 monthName = "June";
                 break;
-            case 6:
+            case 7:
                 monthName = "July";
                 break;
-            case 7:
+            case 8:
                 monthName = "August";
                 break;
-            case 8:
+            case 9:
                 monthName = "September";
                 break;
-            case 9:
+            case 10:
                 monthName = "October";
                 break;
-            case 10:
+            case 11:
                 monthName = "November";
                 break;
-            case 11:
+            case 12:
                 monthName = "December";
                 break;
             default:

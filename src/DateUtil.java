@@ -24,6 +24,12 @@ public class DateUtil {
                 calendar.get(Calendar.DAY_OF_MONTH));
     }
 
+    public static int getWeekOfMonth(CalendarDate calendarDate) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(calendarDate.getYear(), calendarDate.getMonth(), calendarDate.getDay());
+        return Calendar.WEEK_OF_MONTH;
+    }
+
     /**
      * get all dates in the same month with given date
      *
@@ -51,6 +57,21 @@ public class DateUtil {
         else
             daysInMonth = 31;
         return daysInMonth;
+    }
+
+    public static int getLineInPane(CalendarDate calendarDate) {
+        int m = calendarDate.getMonth();
+        int y = calendarDate.getYear();
+        CalendarDate cd = new CalendarDate(y, m, 1);
+        int addD = cd.getDayOfWeek() % 7;   // 4
+//        int dim = DateUtil.getNumberOfDaysInMonth(calendarDate);
+//        int daysInMonthADD = addD + dim;
+//        int firstLineHasDays = 7 - addD;     //2
+        int lineIndex = (calendarDate.getDay() + addD - 1) / 7 + 1;
+//        int d = calendarDate.getDay();
+//        int x = calendarDate.getDayOfWeek();
+//        int wom = (d - x) / 7 + 1;
+        return lineIndex;
     }
 
     public static int dayIndexOfYear(int year, int month, int day) {
