@@ -1,25 +1,56 @@
-/*
-* Start here!
-*
-* */
-
-import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-public class Main extends Application {
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+
+import java.awt.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+/*
+* You need to implement Calendar GUI here!
+* show the calendar of month of today.
+* jump to last/next month's calendar
+* jump to last/next year's calendar
+*
+* jump to one specific day's calendar
+* */
+/*public class Display {
+
+    public Display() {
+    }
+
+    /**
+     * Init the UI Windows here. For example, the frame, some panels and buttons.
+     */
+
+/*private void init() {
+    }*/
+
+/**
+ * paint the days of whole current month on the frame with the given CalendarDate
+ *
+// * @param date a valid CalendarDate param.
+ */
+
+    /*private void paintDays(CalendarDate date) {
+    }
+
+
+}*/
+
+public class Display extends Application {
     @Override
     public void start(Stage primaryStage) {
 
@@ -28,8 +59,8 @@ public class Main extends Application {
 
         // Pane to hold buttons
         HBox buttonBox = new HBox(10);
-        Button btAdd = new Button(">");
-        Button btSub = new Button("<");
+        Button btAdd = new Button("+");
+        Button btSub = new Button("-");
         btAdd.setOnAction(e -> calendarPane.nextMonth());
         btSub.setOnAction(e -> calendarPane.lastMonth());
         buttonBox.getChildren().addAll(btSub, btAdd);
@@ -214,28 +245,3 @@ class CalendarPane extends Pane {
         return monthName;
     }
 }
-/*    public static void main(String[] args) {
-
-        //todo  We will run this class to test your codes.
-        CalendarDate calendarDate = new CalendarDate("2018-2-20");
-        System.out.println(calendarDate.getDayOfWeek());
-        System.out.println(DateUtil.getNumberOfDaysInMonth(calendarDate));
-        System.out.println(DateUtil.isFormatted("18-3-20"));
-    }
-}*/
-
-/*
-                System.out.println(DateUtil.getCurrentYear());
-                System.out.println(DateUtil.getCurrentMonth());
-                System.out.println(DateUtil.getCurrentDay());
-                */
-//        List<CalendarDate> list = DateUtil.getDaysInMonth(calendarDate);
-
-//        int x = DateUtil.getDaysInMonth(calendarDate);
-
-//        int listSize = list.size();
-//        for (int i = 0; i < listSize; i++) {
-//            System.out.println(list.get(i).getDay());
-//        }
-//        System.out.println(x);
-//        DateUtil.isFormatted("2018-3-20");

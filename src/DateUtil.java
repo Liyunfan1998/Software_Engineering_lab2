@@ -51,7 +51,6 @@ public class DateUtil {
         else
             daysInMonth = 31;
         return daysInMonth;
-//        List<CalendarDate> listCalendarDate  = new List<>();
     }
 
     public static int dayIndexOfYear(int year, int month, int day) {
