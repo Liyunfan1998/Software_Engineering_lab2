@@ -4,14 +4,15 @@
 * */
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -30,20 +31,72 @@ public class Main extends Application {
         HBox buttonBox = new HBox(10);
         Button btAdd = new Button(">");
         Button btSub = new Button("<");
+        Button btLastYear = new Button("<<");
+        Button btNextYear = new Button(">>");
         btAdd.setOnAction(e -> calendarPane.nextMonth(calendarDate));
         btSub.setOnAction(e -> calendarPane.lastMonth(calendarDate));
-        buttonBox.getChildren().addAll(btSub, btAdd);
+        btLastYear.setOnAction(e -> calendarPane.lastYear(calendarDate));
+        btNextYear.setOnAction(e -> calendarPane.nextYear(calendarDate));
+        buttonBox.getChildren().addAll(btLastYear, btSub, btAdd, btNextYear);
         buttonBox.setAlignment(Pos.CENTER);
+
+
+        HBox topBox = new HBox(10);
+        Button bChooseSearch = new Button("选择框查询");
+        ObservableList<String> arr;
+        arr = FXCollections.observableArrayList();
+        for (int i = 0; i < 300; i++) {
+            arr.add((1800 + i) + "");
+        }
+        final int[] chooseYear = {1800};
+        final int[] chooseMonth = {1};
+        ChoiceBox cbYear = new ChoiceBox<>(FXCollections.observableArrayList(arr));
+        cbYear.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
+            chooseYear[0] = newv.intValue() + 1800;
+        });
+        ChoiceBox<String> cbMonth = new ChoiceBox<>(FXCollections.observableArrayList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"));
+        cbMonth.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
+            chooseMonth[0] = newv.intValue() + 1;
+        });
+        bChooseSearch.setOnAction(e -> {
+            CalendarDate calendarDate1 = new CalendarDate(chooseYear[0], chooseMonth[0], 1);
+            calendarPane.draw(calendarDate1);
+        });
+
+        topBox.getChildren().addAll(cbYear, cbMonth, bChooseSearch);
+        topBox.setAlignment(Pos.CENTER);
+
+        HBox bottomBox = new HBox(10);
+        Button bTypeSearch = new Button("输入查询");
+        TextField textField = new TextField();
+        bTypeSearch.setOnAction(event -> {
+            String date = textField.getText();
+            if (DateUtil.isFormatted(date)) {
+                CalendarDate cd = new CalendarDate(date);
+                if (DateUtil.isValid(cd)) {
+                    calendarPane.search(cd);
+                }
+            }
+        });
+        bottomBox.getChildren().addAll(textField, bTypeSearch);
+        bottomBox.setAlignment(Pos.CENTER);
+
+        VBox vBottomBox = new VBox(10);
+        vBottomBox.getChildren().addAll(buttonBox, bottomBox);
+        vBottomBox.setAlignment(Pos.CENTER);
 
         // Create BorderPane and place all of the elements
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(calendarPane);
-        borderPane.setBottom(buttonBox);
-
-        Scene scene = new Scene(borderPane, 450, 200);
+        borderPane.setBottom(vBottomBox);
+        borderPane.setTop(topBox);
+        Scene scene = new Scene(borderPane, 450, 400);
         primaryStage.setTitle("Calendar");
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void bTypeSearch(CalendarDate calendarDate) {
     }
 
     public static void main(String[] args) {
@@ -72,7 +125,25 @@ class CalendarPane extends Pane {
     /**
      * Advance the calendar by 1 month
      */
-    public void nextMonth(CalendarDate calendarDate) {
+    void nextYear(CalendarDate calendarDate) {
+        simpleChangeYear(calendarDate, 1);
+    }
+
+    private void simpleChangeYear(CalendarDate calendarDate, int x) {
+        int y = calendarDate.getYear();
+        calendarDate.setYear(y + x);
+        draw(calendarDate);
+    }
+
+    public void search(CalendarDate calendarDate) {
+        draw(calendarDate);
+    }
+
+    void lastYear(CalendarDate calendarDate) {
+        simpleChangeYear(calendarDate, -1);
+    }
+
+    void nextMonth(CalendarDate calendarDate) {
         int m = calendarDate.getMonth();
         if (m == 12) {
             m = 0;
@@ -86,7 +157,7 @@ class CalendarPane extends Pane {
     /**
      * Decrement the calendar by 1 month
      */
-    public void lastMonth(CalendarDate calendarDate) {
+    void lastMonth(CalendarDate calendarDate) {
         int m = calendarDate.getMonth();
         if (m == 1) {
             m = 13;
@@ -100,7 +171,8 @@ class CalendarPane extends Pane {
     /**
      * Set up the calendar pane and get the require objects
      */
-    private void draw(CalendarDate calendarDate) {
+    protected void draw(CalendarDate calendarDate) {
+//      先加高亮的逻辑部分,加在getCalendarGrid函数里
         this.getChildren().clear();
         // Create the border pane, then get the calendar header and body
         BorderPane borderPane = new BorderPane();
@@ -123,6 +195,7 @@ class CalendarPane extends Pane {
 
     private Pane getCalendarGrid(CalendarDate calendarDate) {
         // Variables
+        int day = calendarDate.getDay();
         int dayOfWeek = calendarDate.getDayOfWeek();
         int daysInMonth = DateUtil.getNumberOfDaysInMonth(calendarDate);
 
@@ -145,7 +218,12 @@ class CalendarPane extends Pane {
             CalendarDate cd = thisMonth.get(i - 1);
             int columnIndex = cd.getDayOfWeek() % 7;
             int rowIndex = DateUtil.getLineInPane(cd);
-            calendarGrid.add(new Text(cd.getDay() + ""), columnIndex, rowIndex);
+            Button button = new Button(cd.getDay() + "");
+            button.setMinWidth(45);
+            if (i == day) {
+                button.setStyle("-fx-background-color: red");
+            }
+            calendarGrid.add(button, columnIndex, rowIndex);
         }
 
         // Print the dates for the previous month on the current calendar
