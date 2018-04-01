@@ -17,9 +17,9 @@ import javafx.stage.Stage;
 *
 * jump to one specific day's calendar
 * */
-public class Display {
+class Display2 {
 
-    public Display() {
+    public Display2() {
     }
 
     /**
@@ -41,7 +41,7 @@ public class Display {
 
 }
 
-class CalendarPane extends Pane {
+public class Display extends Pane {
     //    private Calendar calendar;
 //    private CalendarDate calendarDate;
     private Text calendarLabel;
@@ -50,10 +50,10 @@ class CalendarPane extends Pane {
     /**
      * Default constructor
      */
-    CalendarPane(CalendarDate calendarDate) {
+    Display(CalendarDate calendarDate) {
         calendarDate = DateUtil.getToday();
 //        calendarDate.setDay(1);
-        draw(calendarDate);
+        printDays(calendarDate);
     }
 
     /**
@@ -66,11 +66,11 @@ class CalendarPane extends Pane {
     private void simpleChangeYear(CalendarDate calendarDate, int x) {
         int y = calendarDate.getYear();
         calendarDate.setYear(y + x);
-        draw(calendarDate);
+        printDays(calendarDate);
     }
 
     public void search(CalendarDate calendarDate) {
-        draw(calendarDate);
+        printDays(calendarDate);
     }
 
     public void f_alert_informationDialog(String p_header, String p_message, Stage primaryStage) {
@@ -94,7 +94,7 @@ class CalendarPane extends Pane {
             calendarDate.setYear(y + 1);
         }
         calendarDate.setMonth(m + 1);
-        draw(calendarDate);
+        printDays(calendarDate);
     }
 
     /**
@@ -108,13 +108,13 @@ class CalendarPane extends Pane {
             calendarDate.setYear(y - 1);
         }
         calendarDate.setMonth(m - 1);
-        draw(calendarDate);
+        printDays(calendarDate);
     }
 
     /**
      * Set up the calendar pane and get the require objects
      */
-    protected void draw(CalendarDate calendarDate) {
+    protected void printDays(CalendarDate calendarDate) {
 //      先加高亮的逻辑部分,加在getCalendarGrid函数里
         this.getChildren().clear();
         // Create the border pane, then get the calendar header and body
@@ -133,7 +133,7 @@ class CalendarPane extends Pane {
     }
 
     private void showToday() {
-        draw(DateUtil.getToday());
+        printDays(DateUtil.getToday());
     }
 
     private Pane getCalendarGrid(CalendarDate calendarDate) {

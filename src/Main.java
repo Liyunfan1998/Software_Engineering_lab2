@@ -24,8 +24,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
 
         CalendarDate calendarDate = DateUtil.getToday();
-        // Create a new CalendarPane
-        CalendarPane calendarPane = new CalendarPane(calendarDate);
+        // Create a new Display
+        Display display = new Display(calendarDate);
 
         // Pane to hold buttons
         HBox buttonBox = new HBox(10);
@@ -33,10 +33,10 @@ public class Main extends Application {
         Button btSub = new Button("<");
         Button btLastYear = new Button("<<");
         Button btNextYear = new Button(">>");
-        btAdd.setOnAction(e -> calendarPane.nextMonth(calendarDate));
-        btSub.setOnAction(e -> calendarPane.lastMonth(calendarDate));
-        btLastYear.setOnAction(e -> calendarPane.lastYear(calendarDate));
-        btNextYear.setOnAction(e -> calendarPane.nextYear(calendarDate));
+        btAdd.setOnAction(e -> display.nextMonth(calendarDate));
+        btSub.setOnAction(e -> display.lastMonth(calendarDate));
+        btLastYear.setOnAction(e -> display.lastYear(calendarDate));
+        btNextYear.setOnAction(e -> display.nextYear(calendarDate));
         buttonBox.getChildren().addAll(btLastYear, btSub, btAdd, btNextYear);
         buttonBox.setAlignment(Pos.CENTER);
 
@@ -59,8 +59,11 @@ public class Main extends Application {
             chooseMonth[0] = newv.intValue() + 1;
         });
         bChooseSearch.setOnAction(e -> {
-            CalendarDate calendarDate1 = new CalendarDate(chooseYear[0], chooseMonth[0], 1);
-            calendarPane.draw(calendarDate1);
+//            CalendarDate calendarDate1 = new CalendarDate(chooseYear[0], chooseMonth[0], 1);
+            calendarDate.setYear(chooseYear[0]);
+            calendarDate.setMonth(chooseMonth[0]);
+            calendarDate.setDay(1);
+            display.printDays(calendarDate);
         });
 
         topBox.getChildren().addAll(cbYear, cbMonth, bChooseSearch);
@@ -73,15 +76,22 @@ public class Main extends Application {
             String date = textField.getText();
             if (DateUtil.isFormatted(date)) {
                 CalendarDate cd = new CalendarDate(date);
+                int y, m, d;
+                y = cd.getYear();
+                m = cd.getMonth();
+                d = cd.getDay();
+                calendarDate.setYear(y);
+                calendarDate.setMonth(m);
+                calendarDate.setDay(d);
                 if (DateUtil.isValid(cd)) {
-                    calendarPane.search(cd);
+                    display.search(cd);
                 } else {
 //                    String p_message = "输入格式错误";
 //                    Alert _alert = new Alert(Alert.AlertType.CONFIRMATION,p_message,new ButtonType("取消", ButtonBar.ButtonData.NO),new ButtonType("确定", ButtonBar.ButtonData.YES));
-                    calendarPane.f_alert_informationDialog("ERROR", "输入日期不合法", primaryStage);
+                    display.f_alert_informationDialog("ERROR", "输入日期不合法", primaryStage);
                 }
             } else {
-                calendarPane.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+                display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
 
             }
         });
@@ -98,7 +108,7 @@ public class Main extends Application {
 
         // Create BorderPane and place all of the elements
         BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(calendarPane);
+        borderPane.setCenter(display);
         borderPane.setBottom(vBottomBox);
         borderPane.setTop(topBox);
         Scene scene = new Scene(borderPane, 450, 400);

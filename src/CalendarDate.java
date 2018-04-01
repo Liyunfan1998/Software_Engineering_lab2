@@ -30,27 +30,27 @@ public class CalendarDate {
         setDay(d);
     }
 
-    public int getYear() {
+    int getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    void setYear(int year) {
         this.year = year;
     }
 
-    public int getMonth() {
+    int getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
+    void setMonth(int month) {
         this.month = month;
     }
 
-    public int getDay() {
+    int getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    void setDay(int day) {
         this.day = day;
     }
 
@@ -62,7 +62,7 @@ public class CalendarDate {
      *
      * @return 1-7, 1 stands for Monday and 7 stands for Sunday
      */
-    public int getDayOfWeek() {
+    int getDayOfWeek() {
         int y, m, d;
         y = this.getYear();
         m = this.getMonth();
