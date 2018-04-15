@@ -25,9 +25,22 @@ public class CalendarDate {
         y = Integer.parseInt(arr[0]);
         m = Integer.parseInt(arr[1]);
         d = Integer.parseInt(arr[2]);
+        if (y<0|m<1|m>100|d<1|d>100)
+            return ;
         setYear(y);
         setMonth(m);
         setDay(d);
+    }
+
+    public String toFormatStr() {
+        String m = null, d = null;
+        if (this.getMonth() < 10) {
+            m = "0" + this.getMonth();
+        }
+        if (this.getDay() < 10) {
+            m = "0" + this.getDay();
+        }
+        return this.getYear() + "-" + m + "-" + d;
     }
 
     int getYear() {

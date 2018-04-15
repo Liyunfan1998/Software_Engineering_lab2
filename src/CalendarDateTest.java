@@ -34,6 +34,7 @@ public class CalendarDateTest {
 
         CalendarDate date2 = new CalendarDate(2018, 2, 29);
         int actual2 = date2.getDayOfWeek();
+//        System.out.println(DateUtil.isValid(date2));
         assertEquals(-1, actual2);
 
     }

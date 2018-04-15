@@ -25,6 +25,9 @@ public class DateUtil {
     }
 
     public static int getWeekOfMonth(CalendarDate calendarDate) {
+        if (!isValid(calendarDate)) {
+            return -1;
+        }
         Calendar calendar = Calendar.getInstance();
         calendar.set(calendarDate.getYear(), calendarDate.getMonth(), calendarDate.getDay());
         return Calendar.WEEK_OF_MONTH;
@@ -37,6 +40,10 @@ public class DateUtil {
      * @return a list of days in a whole month
      */
     public static List<CalendarDate> getDaysInMonth(CalendarDate date) {
+        if (!isValid(date)) {
+            // TODO: 2018/4/15
+            return null;
+        }
         int y = date.getYear();
         int m = date.getMonth();
         int numberOfDaysInMonth = getNumberOfDaysInMonth(date);
@@ -48,6 +55,9 @@ public class DateUtil {
     }
 
     public static int getNumberOfDaysInMonth(CalendarDate date) {
+        if (!isValid(date)) {
+            return -1;
+        }
         int year = date.getYear();
         int month = date.getMonth();
         int day = date.getDay();
@@ -60,6 +70,9 @@ public class DateUtil {
     }
 
     public static int getLineInPane(CalendarDate calendarDate) {
+        if (!isValid(calendarDate)) {
+            return -1;
+        }
         int m = calendarDate.getMonth();
         int y = calendarDate.getYear();
         CalendarDate cd = new CalendarDate(y, m, 1);
@@ -116,6 +129,11 @@ public class DateUtil {
      * @return true if the date is valid, false if the date is not valid.
      */
     public static boolean isValid(CalendarDate date) {
+        if (date == null) {
+            return false;
+        } else if (!isLeapYear(date.getYear()) && date.getMonth() == 2 && date.getDay() == 29) {
+            return false;
+        }
         String dateString = date.getYear() + "-" + date.getMonth() + "-" + date.getDay();
         //String eL = "^((((1[6-9]|[2-9]\\d)\\d{2})-(0?[13578]|1[02])-(0?[1-9]|[12]\\d|3[01]))|(((1[6-9]|[2-9]\\d)\\d{2})-(0?[13456789]|1[012])-(0?[1-9]|[12]\\d|30))|(((1[6-9]|[2-9]\\d)\\d{2})-0?2-(0?[1-9]|1\\d|2[0-8]))|(((1[6-9]|[2-9]\\d)(0[48]|[2468][048]|[13579][26])|((16|[2468][048]|[3579][26])00))-0?2-29-)) (20|21|22|23|[0-1]?\\d):[0-5]?\\d:[0-5]?\\d$";
 
@@ -136,6 +154,14 @@ public class DateUtil {
     public static boolean isFormatted(String dateString) {
         try {
             CalendarDate calendarDate = new CalendarDate(dateString);
+            String[] arr = dateString.split("-");
+            int y, m, d;
+            y = Integer.parseInt(arr[0]);
+            m = Integer.parseInt(arr[1]);
+            d = Integer.parseInt(arr[2]);
+            if (y < 0 | m < 1 | m > 100 | d < 1 | d > 100) {
+                return false;
+            }
         } catch (Exception e) {
             return false;
         }

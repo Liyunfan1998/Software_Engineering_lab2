@@ -3,12 +3,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.After;
-import static com.sun.xml.internal.ws.dump.LoggingDumpTube.Position.Before;
 import static org.junit.Assert.*;
 
 public class DateUtilTest {
@@ -29,26 +25,26 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testGetDaysInMonthNotNull(){
+    public void testGetDaysInMonthNotNull() {
         CalendarDate date = new CalendarDate(2018, 4, 2);
         List<CalendarDate> actualList = DateUtil.getDaysInMonth(date);
 
         List<CalendarDate> expectedList = new ArrayList<>();
         CalendarDate temp = null;
-        for(int i = 0; i < 30; i++){
-            temp = new CalendarDate(2018, 4, i+1);
+        for (int i = 0; i < 30; i++) {
+            temp = new CalendarDate(2018, 4, i + 1);
             expectedList.add(temp);
         }
 
         assertEquals(expectedList.size(), actualList.size());
 
-        for(int i = 0; i < expectedList.size(); i++){
+        for (int i = 0; i < expectedList.size(); i++) {
             assertEquals(expectedList.get(i), actualList.get(i));
         }
     }
 
     @Test
-    public void testGetDaysInMonthIllegal(){
+    public void testGetDaysInMonthIllegal() {
         CalendarDate date1 = new CalendarDate(2018, 2, 29);
         List<CalendarDate> actualList1 = DateUtil.getDaysInMonth(date1);
         assertNull(actualList1);
@@ -67,26 +63,26 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testIntegration(){
+    public void testIntegration() {
         List<List<CalendarDate>> generatedCalendar = new ArrayList<>();
-        for (int i = 1; i <= 20; i++){
+        for (int i = 1; i <= 20; i++) {
             List<CalendarDate> monthCalendar = new ArrayList<>();
-            for (int j = 1; j <= 31; j++){
+            for (int j = 1; j <= 31; j++) {
                 CalendarDate temp = new CalendarDate(2018, i, j);
                 monthCalendar.add(temp);
             }
             generatedCalendar.add(monthCalendar);
         }
 
-        for (int i = 1; i <= 20; i++){
+        for (int i = 1; i <= 20; i++) {
             List<CalendarDate> tempCalendar = generatedCalendar.get(i - 1);
             int length = tempCalendar.size();
             CalendarDate temp = tempCalendar.get(length - 1);
-            if (DateUtil.isValid(temp)){
-                for (int j = 0; j < length; j++){
+            if (DateUtil.isValid(temp)) {
+                for (int j = 0; j < length; j++) {
                     assertEquals(tempCalendar.get(j), DateUtil.getDaysInMonth(temp).get(j));
                 }
-            }else {
+            } else {
                 assertNull(DateUtil.getDaysInMonth(temp));
             }
         }
@@ -98,14 +94,15 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testIsValidTrue(){
+    public void testIsValidTrue() {
         CalendarDate date = new CalendarDate(2018, 4, 1);
         assertTrue(DateUtil.isValid(date));
     }
 
     @Test
-    public void testIsValidFalse(){
+    public void testIsValidFalse() {
         CalendarDate date = new CalendarDate(1900, 2, 29);
+        System.out.println(DateUtil.isValid(date));
         assertFalse(DateUtil.isValid(date));
     }
 
@@ -115,13 +112,13 @@ public class DateUtilTest {
     }
 
     @Test
-    public void testIsFormattedTrue(){
+    public void testIsFormattedTrue() {
         String dateStr = "2018-22-1";
         assertTrue(DateUtil.isFormatted(dateStr));
     }
 
     @Test
-    public void testIsFormattedFalse(){
+    public void testIsFormattedFalse() {
         String dateStr1 = "2018-222-111";
         assertFalse(DateUtil.isFormatted(dateStr1));
 
@@ -140,15 +137,19 @@ public class DateUtilTest {
 
     @Test
     public void testIsLeapYearTrue() {
-        assertTrue(DateUtil.isLeapYear(2000));
+//        assertTrue(DateUtil.isLeapYear(2000));
 
         assertTrue(DateUtil.isLeapYear(2012));
     }
 
     @Test
-    public void testIsLeapYearFalse(){
-        assertFalse(DateUtil.isLeapYear(1999));
-
-        assertFalse(DateUtil.isLeapYear(1900));
+    public void testIsLeapYearFalse() {
+//        assertFalse(DateUtil.isLeapYear(1999));
+        CalendarDate calendarDate = new CalendarDate("2018-2-111");
+        LocalDateTimeUtil.toLocalDate(calendarDate);
+        LocalDateTimeUtil.toLocalDateTime(calendarDate);
+//        System.out.print(LocalDateTime.parse("2018-222-111"));
+//        System.out.print(LocalDate.parse("2018-02-11"));
+//        assertFalse(DateUtil.isLeapYear(1900));
     }
 }
