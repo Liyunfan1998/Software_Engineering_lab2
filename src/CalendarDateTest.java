@@ -2,9 +2,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class CalendarDateTest {
 
@@ -26,7 +27,7 @@ public class CalendarDateTest {
     }
 
     @Test
-    public void testGetDayOfWeekFalse(){
+    public void testGetDayOfWeekFalse() {
         CalendarDate date1 = new CalendarDate(2018, 4, 2);
         int actual1 = date1.getDayOfWeek();
         assertNotEquals(6, actual1);
