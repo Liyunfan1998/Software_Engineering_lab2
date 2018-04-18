@@ -27,6 +27,10 @@ import java.util.Iterator;
 
 
 public class Main extends Application {
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -113,7 +117,8 @@ public class Main extends Application {
         vBottomBox.getChildren().addAll(buttonBox, bottomBox);
         vBottomBox.setAlignment(Pos.CENTER);
 
-        VBox v1 = new VBox();
+        VBox vSearch = new VBox();
+        VBox vAll = new VBox();
         ScrollPane s1 = new ScrollPane();
 
         HBox hBoxSearch = new HBox(10);
@@ -154,21 +159,18 @@ public class Main extends Application {
                 (ObservableValue<? extends Toggle> ov, Toggle old_Toggle,
                  Toggle new_Toggle) -> {
                     if (group.getSelectedToggle() != null) {
-                        switch ((int) group.getSelectedToggle().getUserData()) {
+                        int i = (int) group.getSelectedToggle().getUserData();
+                        Display_to_do_list.clearVbox(vSearch);
+                        s1.setContent(vSearch);
+                        String str = textFieldToDo.getText();
+                        switch (i) {
                             case 1:
                                 searchToDo.setOnAction((ActionEvent event) -> {
-                                    System.out.print(1);
-                                    String str = textFieldToDo.getText();
                                     try {
+                                        System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStart(localDateTime);
-                                        for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
-                                            ToDo_item toDoItem = iterator.next();
-                                            Button b = new Button("ToDo:" + "\nstart: "
-                                                    + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
-                                                    + "\nthingsToDo: " + toDoItem.getThings2Do());
-                                            v1.getChildren().add(b);
-                                        }
+                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -176,18 +178,11 @@ public class Main extends Application {
                                 break;
                             case 2:
                                 searchToDo.setOnAction(event -> {
-                                    System.out.print(2);
-                                    String str = textFieldToDo.getText();
                                     try {
+                                        System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesEnd(localDateTime);
-                                        for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
-                                            ToDo_item toDoItem = iterator.next();
-                                            Button b = new Button("ToDo:" + "\nstart: "
-                                                    + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
-                                                    + "\nthingsToDo: " + toDoItem.getThings2Do());
-                                            v1.getChildren().add(b);
-                                        }
+                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -195,17 +190,10 @@ public class Main extends Application {
                                 break;
                             case 3:
                                 searchToDo.setOnAction(event -> {
-                                    System.out.print(3);
-                                    String str = textFieldToDo.getText();
                                     try {
+                                        System.out.print(i);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStr(str);
-                                        for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
-                                            ToDo_item toDoItem = iterator.next();
-                                            Button b = new Button("ToDo:" + "\nstart: "
-                                                    + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
-                                                    + "\nthingsToDo: " + toDoItem.getThings2Do());
-                                            v1.getChildren().add(b);
-                                        }
+                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -213,18 +201,11 @@ public class Main extends Application {
                                 break;
                             case 4:
                                 searchToDo.setOnAction(event -> {
-                                    System.out.print(4);
-                                    String str = textFieldToDo.getText();
                                     try {
+                                        System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsContainsDT(localDateTime);
-                                        for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
-                                            ToDo_item toDoItem = iterator.next();
-                                            Button b = new Button("ToDo:" + "\nstart: "
-                                                    + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
-                                                    + "\nthingsToDo: " + toDoItem.getThings2Do());
-                                            v1.getChildren().add(b);
-                                        }
+                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -232,9 +213,8 @@ public class Main extends Application {
                                 break;
                             case 5:
                                 searchToDo.setOnAction(event -> {
-                                    System.out.print(5);
-                                    String str = textFieldToDo.getText();
                                     try {
+                                        System.out.print(i);
                                         String[] strArr = str.split(",");
                                         if (strArr.length != 2) {
                                             display.f_alert_informationDialog("ERROR", "输入两个LocalDateTime", primaryStage);
@@ -242,13 +222,7 @@ public class Main extends Application {
                                             LocalDateTime start = LocalDateTime.parse(strArr[0], formatter);
                                             LocalDateTime end = LocalDateTime.parse(strArr[1], formatter);
                                             ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStartEnd(start, end);
-                                            for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
-                                                ToDo_item toDoItem = iterator.next();
-                                                Button b = new Button("ToDo:" + "\nstart: "
-                                                        + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
-                                                        + "\nthingsToDo: " + toDoItem.getThings2Do());
-                                                v1.getChildren().add(b);
-                                            }
+                                            Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                         }
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
@@ -260,16 +234,49 @@ public class Main extends Application {
                     }
                 });
 
+        Display_to_do_list.setScrollPaneAttr(s1);
+        s1.setContent(vSearch);
 
-        s1.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        s1.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        s1.setPannable(true);
-        s1.setPrefSize(340, 220);
-        s1.setMaxWidth(340);
-        s1.setContent(v1);
+        VBox vBoxAddItem = new VBox(10);
+        TextField start = new TextField("StartTime");
+        TextField end = new TextField("EndTime");
+        TextField toDoThings = new TextField("Thing to Do");
+        Button sureAdd = new Button("Sure Add");
+        sureAdd.setOnAction(event -> {
+            try {
+                LocalDateTime startDT = LocalDateTime.parse(start.getText(), formatter);
+                LocalDateTime endDT = LocalDateTime.parse(end.getText(), formatter);
+                String toDoStr = toDoThings.getText();
+                ToDo_item newToDoItem = new ToDo_item(startDT, endDT, toDoStr);
+                toDoList.addToDoItem(newToDoItem);
+                toDoList.saveListAsFile();
+            } catch (Exception e) {
+                display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+        vBoxAddItem.getChildren().addAll(start, end, toDoThings, sureAdd);
 
-        VBox vBoxRight = new VBox(5);
-        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, hBoxRB2, s1);
+
+        Button addNew = new Button("Add Interface!");
+        addNew.setOnAction(event -> {
+            s1.setContent(vBoxAddItem);
+        });
+        Button backToAll = new Button("Back to List");
+        backToAll.setOnAction(event -> {
+            Display_to_do_list.clearVbox(vAll);
+            for (Iterator<ToDo_item> iterator = toDoList.getAllItems().iterator(); iterator.hasNext(); ) {
+                ToDo_item toDoItem = iterator.next();
+                Display_to_do_list.addButtonByItem(toDoList, toDoItem, s1, vAll, display, primaryStage);
+            }
+            s1.setContent(vAll);
+        });
+        Button buttSave = new Button("Save as file");
+        buttSave.setOnAction(event -> {
+            toDoList.saveListAsFile();
+        });
+
+        VBox vBoxRight = new VBox(10);
+        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, hBoxRB2, s1, addNew, backToAll, buttSave);
         vBoxRight.setAlignment(Pos.CENTER);
 
         // Create BorderPane and place all of the elements
@@ -292,10 +299,6 @@ public class Main extends Application {
     }
 
     private void bTypeSearch(CalendarDate calendarDate) {
-    }
-
-    public static void main(String[] args) {
-        Application.launch(args);
     }
 }
 

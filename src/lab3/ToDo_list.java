@@ -18,6 +18,11 @@ import java.util.Iterator;
 public class ToDo_list {
     private ArrayList<ToDo_item> toDoItemArrayList = new ArrayList<>();
 
+    public ArrayList<ToDo_item> getAllItems() {
+        return toDoItemArrayList;
+    }
+
+
     public ArrayList<ToDo_item> getToDoItemsMatchesDate(LocalDate date) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
@@ -75,7 +80,7 @@ public class ToDo_list {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
-            LocalDateTime end = ((ToDo_item) iterator.next()).getEndTime();
+            LocalDateTime end = nextToDo.getEndTime();
             if (end.isEqual(dateTime2)) {
                 toDoItems.add(nextToDo);
             }
@@ -107,7 +112,11 @@ public class ToDo_list {
     }
 
     public void deleteToDoItem(ToDo_item toDoItem) {
-        toDoItemArrayList.remove(toDoItem);
+        try {
+            toDoItemArrayList.remove(toDoItem);
+        } catch (Exception e) {
+            System.out.println("No Such Item !");
+        }
     }
 
     public void sortItemsByStartTime() {
@@ -117,11 +126,13 @@ public class ToDo_list {
     public static boolean isSubstring(String str, String target) {
         if (target.length() == 0)
             return false;
-        if (str.equalsIgnoreCase(target))
-            return true;
-        else
-            return isSubstring(str, target.substring(0, target.length() - 1))
-                    || isSubstring(str, target.substring(1));
+//        if (str.equalsIgnoreCase(target))
+//            return true;
+        else {
+            return target.toLowerCase().contains(str.toLowerCase());
+//            return isSubstring(str, target.substring(0, target.length() - 1))
+//                    || isSubstring(str, target.substring(1));
+        }
     }
 
     public void loadListFromFile() {
@@ -130,16 +141,19 @@ public class ToDo_list {
                     "src/json/ToDoList.json"));// 读取原始json文件
 
             String s = null;
+            String allStr = "";
             while ((s = br.readLine()) != null) {
-                try {
-                    System.out.println(s);
-                    JSONObject dataJson = JSONObject.fromObject(s);
-                    convertJsonArray2ToDoList(dataJson);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                allStr += s;
             }
+            try {
+                System.out.println(allStr);
+                JSONObject dataJson = JSONObject.fromObject(allStr);
+                convertJsonArray2ToDoList(dataJson);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
             br.close();
 
         } catch (IOException e) {
@@ -156,8 +170,8 @@ public class ToDo_list {
             String end = toDo.getString("end");
             String str = toDo.getString("str");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-            LocalDateTime startTime = LocalDateTime.parse(start,formatter);
-            LocalDateTime endTime = LocalDateTime.parse(end,formatter);
+            LocalDateTime startTime = LocalDateTime.parse(start, formatter);
+            LocalDateTime endTime = LocalDateTime.parse(end, formatter);
             ToDo_item toDoItem = new ToDo_item(startTime, endTime, str);
             this.addToDoItem(toDoItem);
         }
@@ -184,7 +198,7 @@ public class ToDo_list {
             JSONArray jsonArray = convert2JsonArray();
             BufferedWriter bw = new BufferedWriter(new FileWriter(
                     "src/json/ToDoList.json"));// 输出新的json文件
-            String ws = jsonArray.toString(1);
+            String ws = "{\"ToDoList\":" + jsonArray.toString(1) + "}";
             bw.write(ws);
             bw.flush();
             bw.close();
