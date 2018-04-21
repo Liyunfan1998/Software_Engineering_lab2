@@ -103,9 +103,9 @@ public class DateUtil {
             case 9:
                 count += 31;
             case 8:
-                count += 30;
-            case 7:
                 count += 31;
+            case 7:
+                count += 30;
             case 6:
                 count += 31;
             case 5:

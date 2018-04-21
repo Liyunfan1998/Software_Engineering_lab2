@@ -18,6 +18,13 @@ import java.util.Iterator;
 public class ToDo_list {
     private ArrayList<ToDo_item> toDoItemArrayList = new ArrayList<>();
 
+    public ToDo_list() {
+    }
+
+    public ToDo_list(ArrayList<ToDo_item> toDoItemArrayList) {
+        this.toDoItemArrayList = toDoItemArrayList;
+    }
+
     public ArrayList<ToDo_item> getAllItems() {
         return toDoItemArrayList;
     }
@@ -63,6 +70,20 @@ public class ToDo_list {
         }
         return toDoItems;
     }
+
+    public ArrayList<ToDo_item> getToDoItemsBetweenStartEnd(LocalDateTime dateTime1, LocalDateTime dateTime2) {
+        ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
+            ToDo_item nextToDo = (ToDo_item) iterator.next();
+            LocalDateTime start = nextToDo.getStartTime();
+            LocalDateTime end = nextToDo.getEndTime();
+            if ((dateTime1.isBefore(start) || dateTime1.isEqual(start)) && (end.isBefore(dateTime2) || end.isEqual(dateTime2))) {
+                toDoItems.add(nextToDo);
+            }
+        }
+        return toDoItems;
+    }
+
 
     public ArrayList<ToDo_item> getToDoItemsMatchesStart(LocalDateTime dateTime1) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();

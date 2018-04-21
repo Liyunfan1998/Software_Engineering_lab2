@@ -1,16 +1,28 @@
 package lab2;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import lab3.Display_to_do_list;
+import lab3.Main;
+import lab3.ToDo_item;
 import lab3.ToDo_list;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /*
 * You need to implement Calendar GUI here!
@@ -26,14 +38,17 @@ public class Display extends Pane {
 //    private lab2.CalendarDate calendarDate;
     private Text calendarLabel;
     private String monthName;
+    private ToDo_list toDolist;
+    private Stage stage;
 
     /**
      * Default constructor
      */
-    public Display(CalendarDate calendarDate) {
+    public Display(CalendarDate calendarDate, ToDo_list toDoList) {
         calendarDate = DateUtil.getToday();
+        this.toDolist = toDoList;
 //        calendarDate.setDay(1);
-        printDays(calendarDate);
+        printDays(calendarDate, toDoList);
     }
 
     /**
@@ -46,11 +61,11 @@ public class Display extends Pane {
     private void simpleChangeYear(CalendarDate calendarDate, int x) {
         int y = calendarDate.getYear();
         calendarDate.setYear(y + x);
-        printDays(calendarDate);
+        printDays(calendarDate, toDolist);
     }
 
     public void search(CalendarDate calendarDate) {
-        printDays(calendarDate);
+        printDays(calendarDate, toDolist);
     }
 
     public void f_alert_informationDialog(String p_header, String p_message, Stage primaryStage) {
@@ -74,7 +89,7 @@ public class Display extends Pane {
             calendarDate.setYear(y + 1);
         }
         calendarDate.setMonth(m + 1);
-        printDays(calendarDate);
+        printDays(calendarDate, toDolist);
     }
 
     /**
@@ -88,19 +103,19 @@ public class Display extends Pane {
             calendarDate.setYear(y - 1);
         }
         calendarDate.setMonth(m - 1);
-        printDays(calendarDate);
+        printDays(calendarDate, toDolist);
     }
 
     /**
      * Set up the calendar pane and get the require objects
      */
-    public void printDays(CalendarDate calendarDate) {
+    public void printDays(CalendarDate calendarDate, ToDo_list toDoList) {
 //      先加高亮的逻辑部分,加在getCalendarGrid函数里
         this.getChildren().clear();
         // Create the border pane, then get the calendar header and body
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(getCalendarHeader(calendarDate)); //OK
-        borderPane.setCenter(getCalendarGrid(calendarDate));    //Not ok
+        borderPane.setCenter(getCalendarGrid(calendarDate, toDoList));    //Not ok
 
         displayCalendar(borderPane);
     }
@@ -113,11 +128,12 @@ public class Display extends Pane {
     }
 
     private void showToday() {
-        printDays(DateUtil.getToday());
+        printDays(DateUtil.getToday(), toDolist);
     }
 
-    private Pane getCalendarGrid(CalendarDate calendarDate) {
+    private Pane getCalendarGrid(CalendarDate calendarDate, ToDo_list toDoList) {
         // Variables
+        List<LocalDate> localDateList = Display_to_do_list.emuDate(toDoList);
         int day = calendarDate.getDay();
         int dayOfWeek = calendarDate.getDayOfWeek();
         int daysInMonth = DateUtil.getNumberOfDaysInMonth(calendarDate);
@@ -137,17 +153,39 @@ public class Display extends Pane {
         //        Calendar lastMonth = (Calendar) calendar.clone();
         java.util.List<CalendarDate> thisMonth = DateUtil.getDaysInMonth(calendarDate);
         // Clone does not effect current calendar object
+        ToggleGroup group = new ToggleGroup();
+        int y = calendarDate.getYear();
+        int m = calendarDate.getMonth();
         for (int i = 1; i <= daysInMonth; i++) {
             CalendarDate cd = thisMonth.get(i - 1);
             int columnIndex = cd.getDayOfWeek() % 7;
             int rowIndex = DateUtil.getLineInPane(cd);
-            Button button = new Button(cd.getDay() + "");
+            ToggleButton button = new ToggleButton(cd.getDay() + "");
             button.setMinWidth(45);
+            button.setToggleGroup(group);
+            button.setUserData(LocalDate.of(y, m, i));
+            LocalDate localDate = LocalDate.of(y, m, i);
+            for (Iterator<LocalDate> iterator = localDateList.iterator(); iterator.hasNext(); ) {
+                if (localDate.isEqual(iterator.next())) {
+                    button.setStyle("-fx-text-fill: blue;");
+                }
+            }
             if (i == day) {
                 button.setStyle("-fx-background-color: red");
             }
             calendarGrid.add(button, columnIndex, rowIndex);
         }
+        group.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
+            public void changed(
+                    ObservableValue<? extends Toggle> ov,
+                    Toggle old_toggle, Toggle new_toggle) {
+                if (group.getSelectedToggle() != null) {
+                    System.out.println(group.getSelectedToggle().getUserData());
+                    ArrayList<ToDo_item> matchesDate = toDoList.getToDoItemsMatchesDate((LocalDate) group.getSelectedToggle().getUserData());
+                    Main.setToDisplay(matchesDate, stage);
+                }
+            }
+        });
 
         // Print the dates for the previous month on the current calendar
 
@@ -158,6 +196,7 @@ public class Display extends Pane {
     /**
      * Create the label pane and display current month and year
      */
+
     private Pane getCalendarHeader(CalendarDate calendarDate) {
         calendarLabel = new Text(getMonthName(calendarDate.getMonth()) + ", " + calendarDate.getYear());
         HBox labelBox = new HBox();

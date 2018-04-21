@@ -31,12 +31,22 @@ public class Main extends Application {
         Application.launch(args);
     }
 
+    private static ScrollPane s1 = new ScrollPane();
+    private static VBox vBoxAddItem = new VBox(10);
+    private static VBox vSearch = new VBox();
+    private static VBox vAll = new VBox();
+    private static Display display;
+    private static ToDo_list toDoList = new ToDo_list();
+
     @Override
     public void start(Stage primaryStage) {
 
         CalendarDate calendarDate = DateUtil.getToday();
         // Create a new lab2.Display
-        Display display = new Display(calendarDate);
+
+        toDoList.loadListFromFile();
+
+        display = new Display(calendarDate, toDoList);
 
         // Pane to hold buttons
         HBox buttonBox = new HBox(10);
@@ -74,7 +84,7 @@ public class Main extends Application {
             calendarDate.setYear(chooseYear[0]);
             calendarDate.setMonth(chooseMonth[0]);
             calendarDate.setDay(1);
-            display.printDays(calendarDate);
+            display.printDays(calendarDate, toDoList);
         });
 
         topBox.getChildren().addAll(cbYear, cbMonth, bChooseSearch);
@@ -117,9 +127,6 @@ public class Main extends Application {
         vBottomBox.getChildren().addAll(buttonBox, bottomBox);
         vBottomBox.setAlignment(Pos.CENTER);
 
-        VBox vSearch = new VBox();
-        VBox vAll = new VBox();
-        ScrollPane s1 = new ScrollPane();
 
         HBox hBoxSearch = new HBox(10);
         Button searchToDo = new Button("查询");
@@ -133,11 +140,11 @@ public class Main extends Application {
         rb1.setToggleGroup(group);
         RadioButton rb2 = new RadioButton("按结束时间");
         rb2.setToggleGroup(group);
-        RadioButton rb3 = new RadioButton("按内容\t");
+        RadioButton rb3 = new RadioButton("按内容");
         rb3.setToggleGroup(group);
-        RadioButton rb4 = new RadioButton("时间段包含指定时间");
+        RadioButton rb4 = new RadioButton("包含输入时间的所有Item");
         rb4.setToggleGroup(group);
-        RadioButton rb5 = new RadioButton("按开始时间和结束时间\t");
+        RadioButton rb5 = new RadioButton("输入开始时间和结束时间，返回期间所有Item\t");
         rb5.setToggleGroup(group);
         hBoxRB1.getChildren().addAll(rb1, rb2, rb3);
         hBoxRB2.getChildren().addAll(rb4, rb5);
@@ -147,9 +154,6 @@ public class Main extends Application {
         rb3.setUserData(3);
         rb4.setUserData(4);
         rb5.setUserData(5);
-
-        ToDo_list toDoList = new ToDo_list();
-        toDoList.loadListFromFile();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 //default
@@ -162,10 +166,10 @@ public class Main extends Application {
                         int i = (int) group.getSelectedToggle().getUserData();
                         Display_to_do_list.clearVbox(vSearch);
                         s1.setContent(vSearch);
-                        String str = textFieldToDo.getText();
                         switch (i) {
                             case 1:
                                 searchToDo.setOnAction((ActionEvent event) -> {
+                                    String str = textFieldToDo.getText();
                                     try {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
@@ -178,6 +182,7 @@ public class Main extends Application {
                                 break;
                             case 2:
                                 searchToDo.setOnAction(event -> {
+                                    String str = textFieldToDo.getText();
                                     try {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
@@ -190,6 +195,7 @@ public class Main extends Application {
                                 break;
                             case 3:
                                 searchToDo.setOnAction(event -> {
+                                    String str = textFieldToDo.getText();
                                     try {
                                         System.out.print(i);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStr(str);
@@ -201,6 +207,7 @@ public class Main extends Application {
                                 break;
                             case 4:
                                 searchToDo.setOnAction(event -> {
+                                    String str = textFieldToDo.getText();
                                     try {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
@@ -213,15 +220,16 @@ public class Main extends Application {
                                 break;
                             case 5:
                                 searchToDo.setOnAction(event -> {
+                                    String str = textFieldToDo.getText();
                                     try {
                                         System.out.print(i);
                                         String[] strArr = str.split(",");
                                         if (strArr.length != 2) {
-                                            display.f_alert_informationDialog("ERROR", "输入两个LocalDateTime", primaryStage);
+                                            display.f_alert_informationDialog("ERROR", "输入两个LocalDateTime，用英文逗号隔开", primaryStage);
                                         } else {
                                             LocalDateTime start = LocalDateTime.parse(strArr[0], formatter);
                                             LocalDateTime end = LocalDateTime.parse(strArr[1], formatter);
-                                            ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStartEnd(start, end);
+                                            ArrayList<ToDo_item> a = toDoList.getToDoItemsBetweenStartEnd(start, end);
                                             Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
                                         }
                                     } catch (Exception e) {
@@ -237,7 +245,6 @@ public class Main extends Application {
         Display_to_do_list.setScrollPaneAttr(s1);
         s1.setContent(vSearch);
 
-        VBox vBoxAddItem = new VBox(10);
         TextField start = new TextField("StartTime");
         TextField end = new TextField("EndTime");
         TextField toDoThings = new TextField("Thing to Do");
@@ -261,14 +268,15 @@ public class Main extends Application {
         addNew.setOnAction(event -> {
             s1.setContent(vBoxAddItem);
         });
-        Button backToAll = new Button("Back to List");
+        Button backToAll = new Button("Refresh & Back to List");
         backToAll.setOnAction(event -> {
             Display_to_do_list.clearVbox(vAll);
             for (Iterator<ToDo_item> iterator = toDoList.getAllItems().iterator(); iterator.hasNext(); ) {
                 ToDo_item toDoItem = iterator.next();
-                Display_to_do_list.addButtonByItem(toDoList, toDoItem, s1, vAll, display, primaryStage);
+                Display_to_do_list.addButtonByItem(new ToDo_list(), toDoList, toDoItem, s1, vAll, display, primaryStage);
             }
             s1.setContent(vAll);
+            display.printDays(calendarDate, toDoList);
         });
         Button buttSave = new Button("Save as file");
         buttSave.setOnAction(event -> {
@@ -276,7 +284,7 @@ public class Main extends Application {
         });
 
         VBox vBoxRight = new VBox(10);
-        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, hBoxRB2, s1, addNew, backToAll, buttSave);
+        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, rb4, rb5, s1, addNew, backToAll);
         vBoxRight.setAlignment(Pos.CENTER);
 
         // Create BorderPane and place all of the elements
@@ -293,13 +301,22 @@ public class Main extends Application {
         borderPaneAll.setRight(borderPaneRight);
 
         Scene scene = new Scene(borderPaneAll, 850, 400);
+        scene.getStylesheets().add("lab3/toggle.css");
         primaryStage.setTitle("Calendar");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void bTypeSearch(CalendarDate calendarDate) {
+    public static void setToDisplay(ArrayList<ToDo_item> toDoItemArrayList, Stage primaryStage) {
+        ToDo_list tempList = new ToDo_list(toDoItemArrayList);
+        Display_to_do_list.clearVbox(vAll);
+        for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
+            ToDo_item toDoItem = iterator.next();
+            Display_to_do_list.addButtonByItem(tempList, toDoList, toDoItem, s1, vAll, display, primaryStage);
+        }
+        s1.setContent(vAll);
     }
+
 }
 
 /**
