@@ -1,10 +1,11 @@
 package lab3;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import lab2.DateUtil;
 
@@ -86,6 +87,27 @@ public class Display_to_do_list extends Pane {
         Main.vAll.getChildren().add(b);
     }
 
+    public static void setRadioButtonGroup(HBox hBoxRB1, HBox hBoxRB2, ToggleGroup group) {
+        RadioButton rb1 = new RadioButton("按开始时间");
+        rb1.setToggleGroup(group);
+        RadioButton rb2 = new RadioButton("按结束时间");
+        rb2.setToggleGroup(group);
+        RadioButton rb3 = new RadioButton("按内容");
+        rb3.setToggleGroup(group);
+        RadioButton rb4 = new RadioButton("包含输入时间\n的所有Item");
+        rb4.setToggleGroup(group);
+        RadioButton rb5 = new RadioButton("输入开始时间和结束时间，\n返回期间所有Item\t");
+        rb5.setToggleGroup(group);
+        hBoxRB1.getChildren().addAll(rb1, rb2, rb3);
+        hBoxRB2.getChildren().addAll(rb4, rb5);
+
+        rb1.setUserData(1);
+        rb2.setUserData(2);
+        rb3.setUserData(3);
+        rb4.setUserData(4);
+        rb5.setUserData(5);
+    }
+
     public static void iteratListAndAddButton(ArrayList<ToDo_item> a, ToDo_list allList, Stage stage) {
         clearVbox(Main.vSearch);
         for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
@@ -128,5 +150,100 @@ public class Display_to_do_list extends Pane {
             dateArray.addAll(localDateList);
         }
         return dateArray;
+    }
+
+    public static void setVBoxAddItem(VBox vBoxAddItem, Stage primaryStage) {
+        TextField start = new TextField("StartTime");
+        TextField end = new TextField("EndTime");
+        final Tooltip tooltip = new Tooltip("请输入格式为 yyyy-mm-ddThh:mm 的日期时间");
+        tooltip.setFont(new Font("Arial", 16));
+        start.setTooltip(tooltip);
+        end.setTooltip(tooltip);
+        TextField toDoThings = new TextField("Thing to Do");
+        Button sureAdd = new Button("Sure Add");
+        sureAdd.setOnAction(event -> {
+            try {
+                LocalDateTime startDT = LocalDateTime.parse(start.getText(), Main.formatter);
+                LocalDateTime endDT = LocalDateTime.parse(end.getText(), Main.formatter);
+                String toDoStr = toDoThings.getText();
+                ToDo_item newToDoItem = new ToDo_item(startDT, endDT, toDoStr);
+                Main.toDoList.addToDoItem(newToDoItem);
+                Main.toDoList.saveListAsFile();
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+        vBoxAddItem.getChildren().addAll(start, end, toDoThings, sureAdd);
+
+    }
+
+    public static void setSearchToDoHandleByStartTime(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+        searchToDo.setOnAction((ActionEvent event) -> {
+            String str = textFieldToDo.getText();
+            try {
+                LocalDateTime localDateTime = LocalDateTime.parse(str, Main.formatter);
+                ArrayList<ToDo_item> a = Main.toDoList.getToDoItemsMatchesStart(localDateTime);
+                Display_to_do_list.iteratListAndAddButton(a, Main.toDoList, primaryStage);
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+    }
+
+    public static void setSearchToDoHandleByEndTime(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+        searchToDo.setOnAction(event -> {
+            String str = textFieldToDo.getText();
+            try {
+                LocalDateTime localDateTime = LocalDateTime.parse(str, Main.formatter);
+                ArrayList<ToDo_item> a = Main.toDoList.getToDoItemsMatchesEnd(localDateTime);
+                Display_to_do_list.iteratListAndAddButton(a, Main.toDoList, primaryStage);
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+    }
+
+    public static void setSearchToDoHandleByContent(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+        searchToDo.setOnAction(event -> {
+            String str = textFieldToDo.getText();
+            try {
+                ArrayList<ToDo_item> a = Main.toDoList.getToDoItemsMatchesStr(str);
+                Display_to_do_list.iteratListAndAddButton(a, Main.toDoList, primaryStage);
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+    }
+
+    public static void setSearchToDoHandleByContaining(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+        searchToDo.setOnAction(event -> {
+            String str = textFieldToDo.getText();
+            try {
+                LocalDateTime localDateTime = LocalDateTime.parse(str, Main.formatter);
+                ArrayList<ToDo_item> a = Main.toDoList.getToDoItemsContainsDT(localDateTime);
+                Display_to_do_list.iteratListAndAddButton(a, Main.toDoList, primaryStage);
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
+    }
+
+    public static void setSearchToDoHandleBetweenStartEnd(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+        searchToDo.setOnAction(event -> {
+            String str = textFieldToDo.getText();
+            try {
+                String[] strArr = str.split(",");
+                if (strArr.length != 2) {
+                    Main.display.f_alert_informationDialog("ERROR", "输入两个LocalDateTime，用英文逗号隔开", primaryStage);
+                } else {
+                    LocalDateTime start = LocalDateTime.parse(strArr[0], Main.formatter);
+                    LocalDateTime end = LocalDateTime.parse(strArr[1], Main.formatter);
+                    ArrayList<ToDo_item> a = Main.toDoList.getToDoItemsBetweenStartEnd(start, end);
+                    Display_to_do_list.iteratListAndAddButton(a, Main.toDoList, primaryStage);
+                }
+            } catch (Exception e) {
+                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+            }
+        });
     }
 }

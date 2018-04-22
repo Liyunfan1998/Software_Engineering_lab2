@@ -160,6 +160,8 @@ public class ToDo_list {
         try {
             BufferedReader br = new BufferedReader(new FileReader(
                     "src/json/ToDoList.json"));// 读取原始json文件
+//            br = new BufferedReader(new FileReader(
+//                    "/Users/luke1998/ToDoList.json"));// 读取原始json文件
 
             String s = null;
             String allStr = "";

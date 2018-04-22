@@ -2,6 +2,9 @@ package lab2;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -9,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import lab3.Display_to_do_list;
@@ -20,6 +24,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static lab3.Main.cbYear;
 
 /*
 * You need to implement Calendar GUI here!
@@ -167,7 +173,7 @@ public class Display extends Pane {
                     button.setStyle("-fx-text-fill: blue;");
                 }
             }
-            if (i == day) {
+            if (LocalDate.of(y,m,i).isEqual(LocalDate.now())) {
                 button.setStyle("-fx-background-color: red");
             }
             calendarGrid.add(button, columnIndex, rowIndex);
@@ -197,8 +203,8 @@ public class Display extends Pane {
     private Pane getCalendarHeader(CalendarDate calendarDate) {
         int y = calendarDate.getYear();
         int m = calendarDate.getMonth();
-        Main.cbMonth.getSelectionModel().select(m-1);
-        Main.cbYear.getSelectionModel().select(y-1800);
+        Main.cbMonth.getSelectionModel().select(m - 1);
+        cbYear.getSelectionModel().select(y - 1800);
         calendarLabel = new Text(getMonthName(calendarDate.getMonth()) + ", " + calendarDate.getYear());
         HBox labelBox = new HBox();
         labelBox.getChildren().addAll(calendarLabel);
@@ -212,7 +218,6 @@ public class Display extends Pane {
      */
     private String getMonthName(int month) {
         // String monthName = null;
-
         switch (month) {
             case 1:
                 monthName = "January";
@@ -256,24 +261,78 @@ public class Display extends Pane {
         return monthName;
     }
 
-    public void setRadioButtonGroup(HBox hBoxRB1, HBox hBoxRB2, ToggleGroup group) {
-        RadioButton rb1 = new RadioButton("按开始时间");
-        rb1.setToggleGroup(group);
-        RadioButton rb2 = new RadioButton("按结束时间");
-        rb2.setToggleGroup(group);
-        RadioButton rb3 = new RadioButton("按内容");
-        rb3.setToggleGroup(group);
-        RadioButton rb4 = new RadioButton("包含输入时间的所有Item");
-        rb4.setToggleGroup(group);
-        RadioButton rb5 = new RadioButton("输入开始时间和结束时间，返回期间所有Item\t");
-        rb5.setToggleGroup(group);
-        hBoxRB1.getChildren().addAll(rb1, rb2, rb3);
-        hBoxRB2.getChildren().addAll(rb4, rb5);
+    public void setTopBox(HBox topBox, CalendarDate calendarDate) {
+        Button bChooseSearch = new Button("选择框查询");
+        ObservableList<String> arr;
+        arr = FXCollections.observableArrayList();
+        for (int i = 0; i < 300; i++) {
+            arr.add((1800 + i) + "");
+        }
+        final int[] chooseYear = {1800};
+        final int[] chooseMonth = {1};
+        cbYear = new ChoiceBox<>(FXCollections.observableArrayList(arr));
+        cbYear.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
+            chooseYear[0] = newv.intValue() + 1800;
+        });
+        Main.cbMonth = new ChoiceBox<>(FXCollections.observableArrayList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"));
+        Main.cbMonth.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
+            chooseMonth[0] = newv.intValue() + 1;
+        });
+        bChooseSearch.setOnAction((ActionEvent e) -> {
+//            lab2.CalendarDate calendarDate1 = new lab2.CalendarDate(chooseYear[0], chooseMonth[0], 1);
+            calendarDate.setYear(chooseYear[0]);
+            calendarDate.setMonth(chooseMonth[0]);
+            calendarDate.setDay(1);
+            printDays(calendarDate, Main.toDoList);
+        });
 
-        rb1.setUserData(1);
-        rb2.setUserData(2);
-        rb3.setUserData(3);
-        rb4.setUserData(4);
-        rb5.setUserData(5);
+        topBox.getChildren().addAll(cbYear, Main.cbMonth, bChooseSearch);
+        topBox.setAlignment(Pos.CENTER);
+    }
+
+    public void setButtonBox(HBox buttonBox, CalendarDate calendarDate) {
+        // Pane to hold buttons
+        Button btAdd = new Button(">");
+        Button btSub = new Button("<");
+        Button btLastYear = new Button("<<");
+        Button btNextYear = new Button(">>");
+        btAdd.setOnAction(e -> nextMonth(calendarDate));
+        btSub.setOnAction(e -> lastMonth(calendarDate));
+        btLastYear.setOnAction(e -> lastYear(calendarDate));
+        btNextYear.setOnAction(e -> nextYear(calendarDate));
+        buttonBox.getChildren().addAll(btLastYear, btSub, btAdd, btNextYear);
+        buttonBox.setAlignment(Pos.CENTER);
+    }
+
+    public void setBottomBox(HBox bottomBox, CalendarDate calendarDate, Stage primaryStage) {
+        Button bTypeSearch = new Button("输入查询");
+        TextField textField = new TextField();
+        bTypeSearch.setOnAction((ActionEvent event) -> {
+            String date = textField.getText();
+            if (DateUtil.isFormatted(date)) {
+                CalendarDate cd = new CalendarDate(date);
+                int y, m, d;
+                y = cd.getYear();
+                m = cd.getMonth();
+                d = cd.getDay();
+                calendarDate.setYear(y);
+                calendarDate.setMonth(m);
+                calendarDate.setDay(d);
+                if (DateUtil.isValid(cd)) {
+                    search(cd);
+                } else {
+                    f_alert_informationDialog("ERROR", "输入日期不合法", primaryStage);
+                }
+            } else {
+                f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+
+            }
+        });
+        final Tooltip tooltip = new Tooltip("请输入格式为 YYYY-MM-DD 的日期");
+        tooltip.setFont(new Font("Arial", 16));
+        textField.setTooltip(tooltip);
+
+        bottomBox.getChildren().addAll(textField, bTypeSearch);
+        bottomBox.setAlignment(Pos.CENTER);
     }
 }
