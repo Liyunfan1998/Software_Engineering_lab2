@@ -4,10 +4,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -198,6 +195,10 @@ public class Display extends Pane {
      */
 
     private Pane getCalendarHeader(CalendarDate calendarDate) {
+        int y = calendarDate.getYear();
+        int m = calendarDate.getMonth();
+        Main.cbMonth.getSelectionModel().select(m-1);
+        Main.cbYear.getSelectionModel().select(y-1800);
         calendarLabel = new Text(getMonthName(calendarDate.getMonth()) + ", " + calendarDate.getYear());
         HBox labelBox = new HBox();
         labelBox.getChildren().addAll(calendarLabel);
@@ -253,5 +254,26 @@ public class Display extends Pane {
 
         }
         return monthName;
+    }
+
+    public void setRadioButtonGroup(HBox hBoxRB1, HBox hBoxRB2, ToggleGroup group) {
+        RadioButton rb1 = new RadioButton("按开始时间");
+        rb1.setToggleGroup(group);
+        RadioButton rb2 = new RadioButton("按结束时间");
+        rb2.setToggleGroup(group);
+        RadioButton rb3 = new RadioButton("按内容");
+        rb3.setToggleGroup(group);
+        RadioButton rb4 = new RadioButton("包含输入时间的所有Item");
+        rb4.setToggleGroup(group);
+        RadioButton rb5 = new RadioButton("输入开始时间和结束时间，返回期间所有Item\t");
+        rb5.setToggleGroup(group);
+        hBoxRB1.getChildren().addAll(rb1, rb2, rb3);
+        hBoxRB2.getChildren().addAll(rb4, rb5);
+
+        rb1.setUserData(1);
+        rb2.setUserData(2);
+        rb3.setUserData(3);
+        rb4.setUserData(4);
+        rb5.setUserData(5);
     }
 }

@@ -31,12 +31,13 @@ public class Main extends Application {
         Application.launch(args);
     }
 
-    private static ScrollPane s1 = new ScrollPane();
+    public static ScrollPane s1 = new ScrollPane();
     private static VBox vBoxAddItem = new VBox(10);
-    private static VBox vSearch = new VBox();
-    private static VBox vAll = new VBox();
-    private static Display display;
+    public static VBox vSearch = new VBox();
+    public static VBox vAll = new VBox();
+    public static Display display;
     private static ToDo_list toDoList = new ToDo_list();
+    public static ChoiceBox cbYear = new ChoiceBox(), cbMonth = new ChoiceBox();
 
     @Override
     public void start(Stage primaryStage) {
@@ -71,11 +72,11 @@ public class Main extends Application {
         }
         final int[] chooseYear = {1800};
         final int[] chooseMonth = {1};
-        ChoiceBox cbYear = new ChoiceBox<>(FXCollections.observableArrayList(arr));
+        cbYear = new ChoiceBox<>(FXCollections.observableArrayList(arr));
         cbYear.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
             chooseYear[0] = newv.intValue() + 1800;
         });
-        ChoiceBox<String> cbMonth = new ChoiceBox<>(FXCollections.observableArrayList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"));
+        cbMonth = new ChoiceBox<>(FXCollections.observableArrayList("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"));
         cbMonth.getSelectionModel().selectedIndexProperty().addListener((ov, oldv, newv) -> {
             chooseMonth[0] = newv.intValue() + 1;
         });
@@ -136,28 +137,9 @@ public class Main extends Application {
         HBox hBoxRB1 = new HBox(10);
         HBox hBoxRB2 = new HBox(10);
         final ToggleGroup group = new ToggleGroup();
-        RadioButton rb1 = new RadioButton("按开始时间");
-        rb1.setToggleGroup(group);
-        RadioButton rb2 = new RadioButton("按结束时间");
-        rb2.setToggleGroup(group);
-        RadioButton rb3 = new RadioButton("按内容");
-        rb3.setToggleGroup(group);
-        RadioButton rb4 = new RadioButton("包含输入时间的所有Item");
-        rb4.setToggleGroup(group);
-        RadioButton rb5 = new RadioButton("输入开始时间和结束时间，返回期间所有Item\t");
-        rb5.setToggleGroup(group);
-        hBoxRB1.getChildren().addAll(rb1, rb2, rb3);
-        hBoxRB2.getChildren().addAll(rb4, rb5);
-
-        rb1.setUserData(1);
-        rb2.setUserData(2);
-        rb3.setUserData(3);
-        rb4.setUserData(4);
-        rb5.setUserData(5);
+        display.setRadioButtonGroup(hBoxRB1, hBoxRB2, group);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-//default
-
 
         group.selectedToggleProperty().addListener(
                 (ObservableValue<? extends Toggle> ov, Toggle old_Toggle,
@@ -174,7 +156,7 @@ public class Main extends Application {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStart(localDateTime);
-                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
+                                        Display_to_do_list.iteratListAndAddButton(a, toDoList, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -187,7 +169,7 @@ public class Main extends Application {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesEnd(localDateTime);
-                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
+                                        Display_to_do_list.iteratListAndAddButton(a, toDoList, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -199,7 +181,7 @@ public class Main extends Application {
                                     try {
                                         System.out.print(i);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsMatchesStr(str);
-                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
+                                        Display_to_do_list.iteratListAndAddButton(a, toDoList, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -212,7 +194,7 @@ public class Main extends Application {
                                         System.out.print(i);
                                         LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
                                         ArrayList<ToDo_item> a = toDoList.getToDoItemsContainsDT(localDateTime);
-                                        Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
+                                        Display_to_do_list.iteratListAndAddButton(a, toDoList, primaryStage);
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                                     }
@@ -230,7 +212,7 @@ public class Main extends Application {
                                             LocalDateTime start = LocalDateTime.parse(strArr[0], formatter);
                                             LocalDateTime end = LocalDateTime.parse(strArr[1], formatter);
                                             ArrayList<ToDo_item> a = toDoList.getToDoItemsBetweenStartEnd(start, end);
-                                            Display_to_do_list.iteratListAndAddButton(a, vSearch, toDoList, s1, display, primaryStage);
+                                            Display_to_do_list.iteratListAndAddButton(a, toDoList, primaryStage);
                                         }
                                     } catch (Exception e) {
                                         display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
@@ -273,7 +255,7 @@ public class Main extends Application {
             Display_to_do_list.clearVbox(vAll);
             for (Iterator<ToDo_item> iterator = toDoList.getAllItems().iterator(); iterator.hasNext(); ) {
                 ToDo_item toDoItem = iterator.next();
-                Display_to_do_list.addButtonByItem(new ToDo_list(), toDoList, toDoItem, s1, vAll, display, primaryStage);
+                Display_to_do_list.addButtonByItem(new ToDo_list(), toDoList, toDoItem, primaryStage);
             }
             s1.setContent(vAll);
             display.printDays(calendarDate, toDoList);
@@ -284,7 +266,7 @@ public class Main extends Application {
         });
 
         VBox vBoxRight = new VBox(10);
-        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, rb4, rb5, s1, addNew, backToAll);
+        vBoxRight.getChildren().addAll(hBoxSearch, hBoxRB1, hBoxRB2, s1, addNew, backToAll);
         vBoxRight.setAlignment(Pos.CENTER);
 
         // Create BorderPane and place all of the elements
@@ -312,39 +294,9 @@ public class Main extends Application {
         Display_to_do_list.clearVbox(vAll);
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item toDoItem = iterator.next();
-            Display_to_do_list.addButtonByItem(tempList, toDoList, toDoItem, s1, vAll, display, primaryStage);
+            Display_to_do_list.addButtonByItem(tempList, toDoList, toDoItem, primaryStage);
         }
         s1.setContent(vAll);
     }
 
 }
-
-/**
- * Extend the Pane class that will create a calendar pane
- */
-
-/*    public static void main(String[] args) {
-
-        //todo  We will run this class to test your codes.
-        lab2.CalendarDate calendarDate = new lab2.CalendarDate("2018-2-20");
-        System.out.println(calendarDate.getDayOfWeek());
-        System.out.println(lab2.DateUtil.getNumberOfDaysInMonth(calendarDate));
-        System.out.println(lab2.DateUtil.isFormatted("18-3-20"));
-    }
-}*/
-
-/*
-                System.out.println(lab2.DateUtil.getCurrentYear());
-                System.out.println(lab2.DateUtil.getCurrentMonth());
-                System.out.println(lab2.DateUtil.getCurrentDay());
-                */
-//        List<lab2.CalendarDate> list = lab2.DateUtil.getDaysInMonth(calendarDate);
-
-//        int x = lab2.DateUtil.getDaysInMonth(calendarDate);
-
-//        int listSize = list.size();
-//        for (int i = 0; i < listSize; i++) {
-//            System.out.println(list.get(i).getDay());
-//        }
-//        System.out.println(x);
-//        lab2.DateUtil.isFormatted("2018-3-20");

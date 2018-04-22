@@ -7,7 +7,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lab2.DateUtil;
-import lab2.Display;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,7 +37,7 @@ public class Display_to_do_list extends Pane {
         }
     }
 
-    public static void addButtonByItem(ToDo_list tempList, ToDo_list allList, ToDo_item toDoItem, ScrollPane s1, VBox vAll, Display display, Stage primaryStage) {
+    public static void addButtonByItem(ToDo_list tempList, ToDo_list allList, ToDo_item toDoItem, Stage primaryStage) {
         Button b = new Button("ToDo:" + "\nstart: "
                 + toDoItem.getStartTime() + "\nend: " + toDoItem.getEndTime()
                 + "\nthingsToDo: " + toDoItem.getThings2Do());
@@ -53,22 +52,22 @@ public class Display_to_do_list extends Pane {
             Button sureDle = new Button("Sure Delete");
             Button sureCha = new Button("Sure Change");
             vChnageOrDelete.getChildren().addAll(start, end, toDoThings, sureCha, sureDle);
-            s1.setContent(vChnageOrDelete);
+            Main.s1.setContent(vChnageOrDelete);
             sureDle.setOnAction(event1 -> {
                 try {
                     allList.deleteToDoItem(toDoItem);
-                    vAll.getChildren().remove(b);
+                    Main.vAll.getChildren().remove(b);
                     allList.saveListAsFile();
-                    s1.setContent(vAll);
-                    display.printDays(DateUtil.getToday(), allList);
+                    Main.s1.setContent(Main.vAll);
+                    Main.display.printDays(DateUtil.getToday(), allList);
                 } catch (Exception e) {
-                    display.f_alert_informationDialog("ERROR", "删除出错 ！", primaryStage);
+                    Main.display.f_alert_informationDialog("ERROR", "删除出错 ！", primaryStage);
                 }
             });
             sureCha.setOnAction(event1 -> {
                 try {
                     allList.deleteToDoItem(toDoItem);
-                    vAll.getChildren().remove(b);
+                    Main.vAll.getChildren().remove(b);
                     LocalDateTime startDT = LocalDateTime.parse(start.getText(), formatter);
                     LocalDateTime endDT = LocalDateTime.parse(end.getText(), formatter);
                     String toDoStr = toDoThings.getText();
@@ -78,20 +77,20 @@ public class Display_to_do_list extends Pane {
                     toDoItem.setThings2Do(toDoStr);
                     allList.addToDoItem(toDoItem);
                     allList.saveListAsFile();
-                    display.printDays(DateUtil.getToday(), allList);
+                    Main.display.printDays(DateUtil.getToday(), allList);
                 } catch (Exception e) {
-                    display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+                    Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
                 }
             });
         });
-        vAll.getChildren().add(b);
+        Main.vAll.getChildren().add(b);
     }
 
-    public static void iteratListAndAddButton(ArrayList<ToDo_item> a, VBox vSearch, ToDo_list allList, ScrollPane s1, Display display, Stage stage) {
-        clearVbox(vSearch);
+    public static void iteratListAndAddButton(ArrayList<ToDo_item> a, ToDo_list allList, Stage stage) {
+        clearVbox(Main.vSearch);
         for (Iterator<ToDo_item> iterator = a.iterator(); iterator.hasNext(); ) {
             ToDo_item toDoItem = iterator.next();
-            Display_to_do_list.addButtonByItem(new ToDo_list(), allList, toDoItem, s1, vSearch, display, stage);
+            Display_to_do_list.addButtonByItem(new ToDo_list(), allList, toDoItem, stage);
         }
     }
 
