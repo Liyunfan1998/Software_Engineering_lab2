@@ -35,11 +35,11 @@ public class Main extends Application {
     public static ToDo_list toDoList = new ToDo_list();
     public static ChoiceBox cbYear = new ChoiceBox(), cbMonth = new ChoiceBox();
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-
+    public static CalendarDate calendarDate;
 
     @Override
     public void start(Stage primaryStage) {
-        CalendarDate calendarDate = DateUtil.getToday();
+        calendarDate = DateUtil.getToday();
         // Create a new lab2.Display
         toDoList.loadListFromFile();
 
@@ -110,6 +110,8 @@ public class Main extends Application {
         Button addNew = new Button("Add Interface!");
         addNew.setOnAction(event -> {
             s1.setContent(vBoxAddItem);
+//            Display_to_do_list.clearVbox(vBoxAddItem);
+//            vBoxAddItem.getChildren().addAll(Display_to_do_list.rbAddByDay, Display_to_do_list.rbAddByTime);
         });
         Button backToAll = new Button("Refresh & Back to List");
         backToAll.setOnAction(event -> {

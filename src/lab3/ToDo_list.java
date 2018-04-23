@@ -32,6 +32,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsMatchesDate(LocalDate date) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (date == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDate startDate = nextToDo.getStartTime().toLocalDate();
@@ -47,6 +50,9 @@ public class ToDo_list {
     //    返回某个dateTime落在若干个toDoItem的起始区间内的所有toDoItem
     public ArrayList<ToDo_item> getToDoItemsContainsDT(LocalDateTime dateTime) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (dateTime == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDateTime start = nextToDo.getStartTime();
@@ -60,6 +66,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsMatchesStartEnd(LocalDateTime dateTime1, LocalDateTime dateTime2) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (dateTime1 == null || dateTime2 == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDateTime start = nextToDo.getStartTime();
@@ -73,6 +82,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsBetweenStartEnd(LocalDateTime dateTime1, LocalDateTime dateTime2) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (dateTime1 == null || dateTime2 == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDateTime start = nextToDo.getStartTime();
@@ -87,6 +99,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsMatchesStart(LocalDateTime dateTime1) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (dateTime1 == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDateTime start = nextToDo.getStartTime();
@@ -99,6 +114,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsMatchesEnd(LocalDateTime dateTime2) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (dateTime2 == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             LocalDateTime end = nextToDo.getEndTime();
@@ -111,6 +129,9 @@ public class ToDo_list {
 
     public ArrayList<ToDo_item> getToDoItemsMatchesStr(String str) {
         ArrayList<ToDo_item> toDoItems = new ArrayList<>();
+        if (str == null) {
+            return toDoItems;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             ToDo_item nextToDo = (ToDo_item) iterator.next();
             String string = nextToDo.getThings2Do();
@@ -122,6 +143,9 @@ public class ToDo_list {
     }
 
     public void addToDoItem(ToDo_item toDoItem) {
+        if (toDoItem == null) {
+            return;
+        }
         for (Iterator<ToDo_item> iterator = toDoItemArrayList.iterator(); iterator.hasNext(); ) {
             if (((ToDo_item) iterator.next()).isEqual(toDoItem)) {
                 System.out.println("Cannot add because of duplication!");
@@ -212,6 +236,9 @@ public class ToDo_list {
     }*/
 
     public void convertJsonArray2ToDoList(JSONObject jsonObjectFromFile) {
+        if (jsonObjectFromFile == null) {
+            return;
+        }
         JSONArray features = jsonObjectFromFile.getJSONArray("ToDoList");
         for (int i = 0; i < features.size(); i++) {
             JSONObject toDo = features.getJSONObject(i);

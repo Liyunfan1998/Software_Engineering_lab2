@@ -1,5 +1,6 @@
 package lab3;
 
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -23,6 +24,9 @@ import java.util.stream.Stream;
  * Created by luke1998 on 2018/4/15.
  */
 public class Display_to_do_list extends Pane {
+    public static RadioButton rbAddByDay = new RadioButton("AddByDay");
+    public static RadioButton rbAddByTime = new RadioButton("AddByTime");
+
     public static void clearPane(Pane pane) {
         int count = pane.getChildren().size();
         for (int i = 0; i < count; i++) {
@@ -153,31 +157,86 @@ public class Display_to_do_list extends Pane {
     }
 
     public static void setVBoxAddItem(VBox vBoxAddItem, Stage primaryStage) {
+        ToggleGroup group = new ToggleGroup();
+        rbAddByTime.setToggleGroup(group);
+        rbAddByDay.setToggleGroup(group);
+        rbAddByTime.setUserData(0);
+        rbAddByDay.setUserData(1);
+
         TextField start = new TextField("StartTime");
         TextField end = new TextField("EndTime");
+        TextField date = new TextField("Date");
         final Tooltip tooltip = new Tooltip("请输入格式为 yyyy-mm-ddThh:mm 的日期时间");
         tooltip.setFont(new Font("Arial", 16));
         start.setTooltip(tooltip);
         end.setTooltip(tooltip);
+        final Tooltip tooltip2 = new Tooltip("请输入格式为 yyyy-mm-dd 的日期");
+        tooltip.setFont(new Font("Arial", 16));
+        date.setTooltip(tooltip2);
         TextField toDoThings = new TextField("Thing to Do");
         Button sureAdd = new Button("Sure Add");
-        sureAdd.setOnAction(event -> {
-            try {
-                LocalDateTime startDT = LocalDateTime.parse(start.getText(), Main.formatter);
-                LocalDateTime endDT = LocalDateTime.parse(end.getText(), Main.formatter);
-                String toDoStr = toDoThings.getText();
-                ToDo_item newToDoItem = new ToDo_item(startDT, endDT, toDoStr);
-                Main.toDoList.addToDoItem(newToDoItem);
-                Main.toDoList.saveListAsFile();
-            } catch (Exception e) {
-                Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
-            }
-        });
-        vBoxAddItem.getChildren().addAll(start, end, toDoThings, sureAdd);
+        vBoxAddItem.getChildren().addAll(rbAddByDay, rbAddByTime);
 
+        group.selectedToggleProperty().addListener(
+                (ObservableValue<? extends Toggle> ov, Toggle old_Toggle,
+                 Toggle new_Toggle) -> {
+                    if (group.getSelectedToggle() != null) {
+                        int i = (int) group.getSelectedToggle().getUserData();
+                        System.out.print("Add type : " + i);
+                        if (i == 0) {
+                            clearVbox(vBoxAddItem);
+                            vBoxAddItem.getChildren().addAll(rbAddByDay, rbAddByTime, start, end, toDoThings, sureAdd);
+                            sureAdd.setOnAction(event -> {
+                                try {
+                                    LocalDateTime startDT = LocalDateTime.parse(start.getText(), Main.formatter);
+                                    LocalDateTime endDT = LocalDateTime.parse(end.getText(), Main.formatter);
+                                    if (startDT.isAfter(endDT)) {
+                                        Main.display.f_alert_informationDialog("Warning", "开始时间晚于结束时间，请更改后重添加", primaryStage);
+                                        return;
+                                    }
+                                    String toDoStr = toDoThings.getText();
+                                    ToDo_item newToDoItem = new ToDo_item(startDT, endDT, toDoStr);
+                                    Main.toDoList.addToDoItem(newToDoItem);
+                                    afterAddItem(primaryStage);
+                                } catch (Exception e) {
+                                    Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+                                }
+                            });
+                        } else {
+                            clearVbox(vBoxAddItem);
+                            vBoxAddItem.getChildren().addAll(rbAddByDay, rbAddByTime, date, toDoThings, sureAdd);
+                            sureAdd.setOnAction(event -> {
+                                try {
+//                                    DateTimeFormatter dFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+//                                    LocalDate DT = LocalDate.parse(date.getText(), dFormatter);
+                                    String date0 = date.getText();
+                                    LocalDateTime startDT = LocalDateTime.parse(date0 + "T00:00", Main.formatter);
+                                    LocalDateTime endDT = LocalDateTime.parse(date0 + "T23:59", Main.formatter);
+                                    if (startDT.isAfter(endDT)) {
+                                        Main.display.f_alert_informationDialog("Warning", "开始时间晚于结束时间，请更改后重添加", primaryStage);
+                                        return;
+                                    }
+                                    String toDoStr = toDoThings.getText();
+                                    ToDo_item newToDoItem = new ToDo_item(startDT, endDT, toDoStr);
+                                    Main.toDoList.addToDoItem(newToDoItem);
+                                    afterAddItem(primaryStage);
+                                } catch (Exception e) {
+                                    Main.display.f_alert_informationDialog("ERROR", "输入格式错误", primaryStage);
+                                }
+                            });
+                        }
+                    }
+                });
     }
 
-    public static void setSearchToDoHandleByStartTime(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+    private static void afterAddItem(Stage primaryStage) {
+        Main.display.f_alert_informationDialog("Congratulations", "添加成功", primaryStage);
+        Main.display.printDays(Main.calendarDate, Main.toDoList);
+        Main.toDoList.saveListAsFile();
+    }
+
+    public static void setSearchToDoHandleByStartTime(Button searchToDo, TextField textFieldToDo, Stage
+            primaryStage) {
         searchToDo.setOnAction((ActionEvent event) -> {
             String str = textFieldToDo.getText();
             try {
@@ -215,7 +274,8 @@ public class Display_to_do_list extends Pane {
         });
     }
 
-    public static void setSearchToDoHandleByContaining(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+    public static void setSearchToDoHandleByContaining(Button searchToDo, TextField textFieldToDo, Stage
+            primaryStage) {
         searchToDo.setOnAction(event -> {
             String str = textFieldToDo.getText();
             try {
@@ -228,7 +288,8 @@ public class Display_to_do_list extends Pane {
         });
     }
 
-    public static void setSearchToDoHandleBetweenStartEnd(Button searchToDo, TextField textFieldToDo, Stage primaryStage) {
+    public static void setSearchToDoHandleBetweenStartEnd(Button searchToDo, TextField textFieldToDo, Stage
+            primaryStage) {
         searchToDo.setOnAction(event -> {
             String str = textFieldToDo.getText();
             try {

@@ -29,8 +29,13 @@ public class ToDo_listTest {
     @Test
     public void testGetToDoItemsContainsDT() {
         ToDo_list toDoList = new ToDo_list();
-        ArrayList<ToDo_item> toDoItems = toDoList.getToDoItemsContainsDT(LocalDateTime.now());
-        assertEquals((new ArrayList<ToDo_item>()).size(), toDoItems.size());
+        ArrayList<ToDo_item> toDoItems;
+//        NULL TEST
+        toDoItems = toDoList.getToDoItemsContainsDT(null);
+        assertEquals(0, toDoItems.size());
+//        Equals TEST
+        toDoItems = toDoList.getToDoItemsContainsDT(LocalDateTime.now());
+        assertEquals(0, toDoItems.size());
         toDoList.addToDoItem(new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep"));
         toDoItems = toDoList.getToDoItemsContainsDT(LocalDateTime.of(2018, 4, 15, 21, 0));
@@ -47,13 +52,18 @@ public class ToDo_listTest {
     @Test
     public void testGetToDoItemsMatchesStartEnd() {
         ToDo_list toDoList = new ToDo_list();
-        ArrayList<ToDo_item> toDoItems = toDoList.getToDoItemsMatchesStartEnd(LocalDateTime.now(), LocalDateTime.now());
-        assertEquals((new ArrayList<ToDo_item>()).size(), toDoItems.size());
+        ArrayList<ToDo_item> toDoItems;
+//      NOT EXIST TEST
+        toDoItems = toDoList.getToDoItemsMatchesStartEnd(LocalDateTime.now(), LocalDateTime.now());
+        assertEquals(0, toDoItems.size());
         toDoList.addToDoItem(new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep"));
+//        NULL TEST
+        toDoItems = toDoList.getToDoItemsMatchesStartEnd(null, LocalDateTime.now());
+        assertEquals(0, toDoItems.size());
+//        Item In List TEST
         toDoItems = toDoList.getToDoItemsMatchesStartEnd(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59));
-
         ArrayList<ToDo_item> rightReturn = new ArrayList<>();
         rightReturn.add(
                 new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
@@ -66,11 +76,17 @@ public class ToDo_listTest {
     public void testGetToDoItemsMatchesStr() {
         ToDo_list toDoList = new ToDo_list();
         ArrayList<ToDo_item> toDoItems = toDoList.getToDoItemsMatchesStr("Sleep");
-        assertEquals((new ArrayList<ToDo_item>()).size(), toDoItems.size());
+        assertEquals(0, toDoItems.size());
         toDoList.addToDoItem(new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep"));
+        //        NOT EXIST TEST
+        toDoItems = toDoList.getToDoItemsMatchesStr("XXXXXXXXX");
+        assertEquals(0, toDoItems.size());
+        //        NULL TEST
+        toDoItems = toDoList.getToDoItemsMatchesStr(null);
+        assertEquals(0, toDoItems.size());
+        //        Item In List TEST
         toDoItems = toDoList.getToDoItemsMatchesStr("Sleep");
-
         ArrayList<ToDo_item> rightReturn = new ArrayList<>();
         rightReturn.add(
                 new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
@@ -83,12 +99,17 @@ public class ToDo_listTest {
     @Test
     public void testGetToDoItemsBetweenStartEnd() {
         ToDo_list toDoList = new ToDo_list();
-        ArrayList<ToDo_item> toDoItems = toDoList.getToDoItemsMatchesStr("Sleep");
-        assertEquals((new ArrayList<ToDo_item>()).size(), toDoItems.size());
+        //        NOT EXIST TEST
+        ArrayList<ToDo_item> toDoItems = toDoList.getToDoItemsBetweenStartEnd(LocalDateTime.of(2018, 4, 15, 19, 59), LocalDateTime.of(2018, 4, 15, 22, 59));
+        assertEquals(0, toDoItems.size());
         toDoList.addToDoItem(new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep"));
-        toDoItems = toDoList.getToDoItemsBetweenStartEnd(LocalDateTime.of(2018, 4, 15, 19, 59), LocalDateTime.of(2018, 4, 15, 22, 59));
 
+        //        NULL TEST
+        toDoItems = toDoList.getToDoItemsBetweenStartEnd(null, null);
+        assertEquals(0, toDoItems.size());
+        //        Item In List TEST
+        toDoItems = toDoList.getToDoItemsBetweenStartEnd(LocalDateTime.of(2018, 4, 15, 19, 59), LocalDateTime.of(2018, 4, 15, 22, 59));
         ArrayList<ToDo_item> rightReturn = new ArrayList<>();
         rightReturn.add(
                 new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
@@ -103,21 +124,36 @@ public class ToDo_listTest {
         ToDo_item toDoItem = new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep");
         toDoList.addToDoItem(toDoItem);
+        //        TEST NULL
+        toDoList.deleteToDoItem(null);
+        ArrayList<ToDo_item> toDoItems = new ArrayList<ToDo_item>();
+        toDoItems.add(toDoItem);
+        assertEquals((new ToDo_list(toDoItems)), toDoList);
 
+//        TEST EXIST
         toDoList.deleteToDoItem(toDoItem);
         assertEquals((new ToDo_list()), toDoList);
+
+//        TEST NOT EXIST
+        toDoList.deleteToDoItem(toDoItem);
+        assertEquals((new ToDo_list()), toDoList);
+
 
     }
 
     @Test
     public void testAddToDoItem() {
         ToDo_list toDoList = new ToDo_list();
+//        TEST EXIST
         ToDo_item toDoItem = new ToDo_item(LocalDateTime.of(2018, 4, 15, 20, 59),
                 LocalDateTime.of(2018, 4, 15, 21, 59), "Sleep");
         toDoList.addToDoItem(toDoItem);
         ArrayList<ToDo_item> toDoItems = new ArrayList<ToDo_item>();
         toDoItems.add(toDoItem);
         ToDo_list add = new ToDo_list(toDoItems);
+        assertEquals(add, toDoList);
+//        TEST NULL
+        toDoList.addToDoItem(null);
         assertEquals(add, toDoList);
     }
 
@@ -158,6 +194,7 @@ public class ToDo_listTest {
 // 使得file变成Test目录下的ToDoList.json
 // 注明：如果文件不存在那么将创建新文件，
 // parse Json， 这是唯一一个程序崩溃的可能性
+        fileRedo();
         ToDo_list toDo_list = new ToDo_list();
 //        String path = ToDo_listTest.class.getResource("ToDoList.json").getPath();
 //        System.out.print(path);

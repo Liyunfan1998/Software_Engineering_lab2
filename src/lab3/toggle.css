@@ -1,4 +1,4 @@
 .toggle-button:selected {
-    -fx-text-fill: blue;
+    -fx-text-fill: greenyellow;
     -fx-border-color: greenyellow;
 }

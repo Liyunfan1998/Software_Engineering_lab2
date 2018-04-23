@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -25,8 +26,8 @@ public class ToDo_itemTest {
 
     @Test
     public void testGetToDoItemTrue() {
-        ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.of(2018,4,20,0,0), LocalDateTime.of(2018,4,20,0,0), "Sleep");
-        ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.of(2018,4,20,0,0), LocalDateTime.of(2018,4,20,0,0), "Sleep");
+        ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.of(2018, 4, 20, 0, 0), LocalDateTime.of(2018, 4, 20, 0, 0), "Sleep");
+        ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.of(2018, 4, 20, 0, 0), LocalDateTime.of(2018, 4, 20, 0, 0), "Sleep");
         assertEquals(toDoItem1, toDoItem2);
     }
 
@@ -35,6 +36,14 @@ public class ToDo_itemTest {
         ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Sleep");
         ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Getup");
         assertNotEquals(toDoItem1, toDoItem2);
+    }
+
+    @Test
+    public void testGetToDoItemNull() {
+        ToDo_item toDoItem1 = new ToDo_item(null, null, null);
+//        even if inputs are NULL, the generation function will automatically generate an item
+//        whose start and end time are now and its str containing "ERROR" for warning
+        assertNotNull(toDoItem1);
     }
 
     @Test

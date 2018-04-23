@@ -10,6 +10,13 @@ public class ToDo_item implements Comparable<ToDo_item>, Cloneable {
     String things2Do;
 
     public ToDo_item(LocalDateTime startTime, LocalDateTime endTime, String things2Do) {
+        if (startTime == null || endTime == null || things2Do == null) {
+            System.out.println("[ERROR] Null !\nAutomatic generate !");
+            this.setStartTime(LocalDateTime.now());
+            this.setEndTime(LocalDateTime.now());
+            this.things2Do = "[ERROR] Null !\nAutomatic generate !";
+            return;
+        }
         if (startTime.isAfter(endTime)) {
             System.out.println("[Warning] startTime should be before endTime !");
         }

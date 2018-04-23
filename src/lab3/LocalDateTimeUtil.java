@@ -14,6 +14,9 @@ public class LocalDateTimeUtil {
     public static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static LocalDateTime toLocalDateTime(CalendarDate calendarDate) {
+        if (calendarDate == null) {
+            return null;
+        }
         try {
             String str = calendarDate.toFormatStr() + "T00:00";
             return LocalDateTime.parse(str, dateTimeFormatter);
@@ -24,6 +27,9 @@ public class LocalDateTimeUtil {
     }
 
     public static LocalDate toLocalDate(CalendarDate calendarDate) {
+        if (calendarDate == null) {
+            return null;
+        }
         try {
             return LocalDate.parse(calendarDate.toFormatStr(), dateFormatter);
         } catch (Exception e) {
