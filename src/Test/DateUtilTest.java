@@ -2,7 +2,6 @@ package Test;
 
 import lab2.CalendarDate;
 import lab2.DateUtil;
-import lab3.LocalDateTimeUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -150,12 +149,14 @@ public class DateUtilTest {
 
     @Test
     public void testIsLeapYearFalse() {
-//        assertFalse(lab2.DateUtil.isLeapYear(1999));
-        CalendarDate calendarDate = new CalendarDate("2018-2-111");
-        LocalDateTimeUtil.toLocalDate(calendarDate);
-        LocalDateTimeUtil.toLocalDateTime(calendarDate);
+        assertFalse(lab2.DateUtil.isLeapYear(1999));
+//        CalendarDate calendarDate = new CalendarDate("2018-2-111");
+//        LocalDateTimeUtil.toLocalDate(calendarDate);
+//        LocalDateTimeUtil.toLocalDateTime(calendarDate);
 //        System.out.print(LocalDateTime.parse("2018-222-111"));
 //        System.out.print(LocalDate.parse("2018-02-11"));
-//        assertFalse(lab2.DateUtil.isLeapYear(1900));
+        assertFalse(lab2.DateUtil.isLeapYear(1900));
+        assertTrue(lab2.DateUtil.isLeapYear(2016));
+        assertTrue(lab2.DateUtil.isLeapYear(2000));
     }
 }

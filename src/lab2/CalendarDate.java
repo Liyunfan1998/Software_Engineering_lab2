@@ -1,5 +1,7 @@
 package lab2;
 
+import java.time.LocalDate;
+
 /**
  * We have finished part of this class yet, you should finish the rest.
  * 1. A constructor that can return a lab2.CalendarDate object through the given string.
@@ -11,9 +13,15 @@ public class CalendarDate {
     private int day;
 
     public CalendarDate(int year, int month, int day) {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+        try {
+            LocalDate localDate = LocalDate.of(year, month, day);
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        } catch (Exception e) {
+            return;
+        }
+
     }
 
     /**
@@ -29,18 +37,25 @@ public class CalendarDate {
         d = Integer.parseInt(arr[2]);
         if (y < 0 | m < 1 | m > 100 | d < 1 | d > 100)
             return;
-        setYear(y);
-        setMonth(m);
-        setDay(d);
+        try {
+            System.out.print("stupid");
+            LocalDate localDate = LocalDate.of(y, m, d);
+            setYear(y);
+            setMonth(m);
+            setDay(d);
+        } catch (Exception e) {
+            return;
+        }
+
     }
 
     public String toFormatStr() {
-        String m = null, d = null;
+        String m = "" + this.getMonth(), d = "" + this.getDay();
         if (this.getMonth() < 10) {
             m = "0" + this.getMonth();
         }
         if (this.getDay() < 10) {
-            m = "0" + this.getDay();
+            d = "0" + this.getDay();
         }
         return this.getYear() + "-" + m + "-" + d;
     }
@@ -82,11 +97,33 @@ public class CalendarDate {
         y = this.getYear();
         m = this.getMonth();
         d = this.getDay();
-        if (m == 1 || m == 2) {
-            m += 12;
-            y--;
+        try {
+            LocalDate.of(y, m, d);
+            if (m == 1 || m == 2) {
+                m += 12;
+                y--;
+            }
+            int dayOfWeek = 1 + (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
+            return dayOfWeek;
+        } catch (Exception e) {
+            return -1;
         }
-        int dayOfWeek = 1 + (d + 2 * m + 3 * (m + 1) / 5 + y + y / 4 - y / 100 + y / 400) % 7;
-        return dayOfWeek;
+
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        try {
+            CalendarDate cd = (CalendarDate) o;
+            int dy = this.getYear() - cd.getYear();
+            int dm = this.getMonth() - cd.getMonth();
+            int dd = this.getDay() - cd.getDay();
+            if (dy == 0 & dm == 0 & dd == 0) {
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

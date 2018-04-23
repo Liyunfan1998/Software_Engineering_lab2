@@ -1,13 +1,15 @@
 package Test;
 
+import lab2.CalendarDate;
 import lab3.LocalDateTimeUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 /**
  * Created by luke1998 on 2018/4/15.
@@ -24,10 +26,20 @@ public class LocalDateTimeUtilTest {
     }
 
     @Test
-    public void testGetStartTimeValid() {
-        LocalDateTime dateTime = LocalDateTime.of(2018, -2, 29, 25, 0, 0, 0);
-//        System.out.println(erro messages);
-        boolean actual = LocalDateTimeUtil.dateTimeValid(dateTime);
-        assertEquals(true, actual);
+    public void testToLocalDateTime() {
+        CalendarDate cd = new CalendarDate(2016, 2, 29);
+        LocalDateTime dateTime = LocalDateTimeUtil.toLocalDateTime(cd);
+        LocalDateTime dt = LocalDateTime.of(2016, 2, 29, 0, 0);
+        boolean isEqual = dateTime.isEqual(dt);
+        assertTrue(isEqual);
+    }
+
+    @Test
+    public void testToLocalDate() {
+        CalendarDate cd = new CalendarDate(2016, 2, 29);
+        LocalDate date = LocalDateTimeUtil.toLocalDate(cd);
+        LocalDate dt = LocalDate.of(2016, 2, 29);
+        boolean isEqual = date.isEqual(dt);
+        assertTrue(isEqual);
     }
 }

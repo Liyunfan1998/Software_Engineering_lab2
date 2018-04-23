@@ -10,22 +10,23 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class ToDo_itemTest {
     @Before
     public void setUp() throws Exception {
-        System.out.println("Class lab2.CalendarDate tests begin! Good luck!");
+        System.out.println("Class lab3.ToDo_item tests begin! Good luck!");
     }
 
     @After
     public void tearDown() throws Exception {
-        System.out.println("Class lab2.CalendarDate tests end! Are you satisfied?");
+        System.out.println("Class lab3.ToDo_item tests end! Are you satisfied?");
     }
 
     @Test
     public void testGetToDoItemTrue() {
-        ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Sleep");
-        ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Sleep");
+        ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.of(2018,4,20,0,0), LocalDateTime.of(2018,4,20,0,0), "Sleep");
+        ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.of(2018,4,20,0,0), LocalDateTime.of(2018,4,20,0,0), "Sleep");
         assertEquals(toDoItem1, toDoItem2);
     }
 
@@ -33,7 +34,7 @@ public class ToDo_itemTest {
     public void testGetToDoItemFalse() {
         ToDo_item toDoItem1 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Sleep");
         ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Getup");
-        assertEquals(toDoItem1, toDoItem2);
+        assertNotEquals(toDoItem1, toDoItem2);
     }
 
     @Test
@@ -51,6 +52,7 @@ public class ToDo_itemTest {
         ToDo_item toDoItem2 = new ToDo_item(LocalDateTime.now(), LocalDateTime.now(), "Getup");
         String str1 = toDoItem1.getThings2Do();
         String str2 = toDoItem2.getThings2Do();
-        assertEquals(str1, str2);
+        assertNotEquals(str1, str2);
     }
+
 }

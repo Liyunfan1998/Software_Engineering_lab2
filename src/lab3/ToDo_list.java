@@ -176,14 +176,40 @@ public class ToDo_list {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
             br.close();
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+//            e.printStackTrace();
+            FileOperation.createFile("src/json/ToDoList.json", "{\"ToDoList\": []}");
+            loadListFromFile();
         }
     }
+/*
+    public void loadListFromFileForTest() {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(
+                    "Test/json/ToDoList.json"));// 读取原始json文件
+            String s = null;
+            String allStr = "";
+            while ((s = br.readLine()) != null) {
+                allStr += s;
+            }
+            try {
+                System.out.println(allStr);
+                JSONObject dataJson = JSONObject.fromObject(allStr);
+                convertJsonArray2ToDoList(dataJson);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            br.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+//            e.printStackTrace();
+            createFile("src/json/ToDoList.json", "{\"ToDoList\": []}");
+        }
+    }*/
 
     public void convertJsonArray2ToDoList(JSONObject jsonObjectFromFile) {
         JSONArray features = jsonObjectFromFile.getJSONArray("ToDoList");
@@ -228,5 +254,22 @@ public class ToDo_list {
         } catch (Exception e) {
             System.out.println("No return list !");
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ToDo_list toDoList = (ToDo_list) o;
+        ArrayList<ToDo_item> toDoItemArr = toDoList.getAllItems();
+        for (Iterator<ToDo_item> iterator1 = toDoItemArrayList.iterator(), iterator2 = toDoItemArr.iterator(); iterator1.hasNext(); ) {
+            if (iterator2.hasNext()) {
+                ToDo_item toDoItem1 = iterator1.next();
+                ToDo_item toDoItem2 = iterator2.next();
+                if (!toDoItem1.isEqual(toDoItem2)) {
+                    return false;
+                }
+            } else return false;
+
+        }
+        return true;
     }
 }

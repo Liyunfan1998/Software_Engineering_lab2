@@ -10,6 +10,9 @@ public class ToDo_item implements Comparable<ToDo_item>, Cloneable {
     String things2Do;
 
     public ToDo_item(LocalDateTime startTime, LocalDateTime endTime, String things2Do) {
+        if (startTime.isAfter(endTime)) {
+            System.out.println("[Warning] startTime should be before endTime !");
+        }
         this.setStartTime(startTime);
         this.setEndTime(endTime);
         this.things2Do = things2Do;
@@ -51,6 +54,14 @@ public class ToDo_item implements Comparable<ToDo_item>, Cloneable {
     }
 
     public boolean isEqual(ToDo_item toDo_item) {
+        return this.getStartTime().isEqual(toDo_item.getStartTime())
+                && this.getEndTime().isEqual(toDo_item.getEndTime())
+                && this.getThings2Do().equalsIgnoreCase(toDo_item.getThings2Do());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        ToDo_item toDo_item = (ToDo_item) o;
         return this.getStartTime().isEqual(toDo_item.getStartTime())
                 && this.getEndTime().isEqual(toDo_item.getEndTime())
                 && this.getThings2Do().equalsIgnoreCase(toDo_item.getThings2Do());
